@@ -1,0 +1,1579 @@
+kubernetes:-
+-------------------------------------------------------------
+
+>>>> kubernetes certifications:-
+  ++ CKAD ()
+  ++ CKA (Administration)
+  ++ CKS (Security)
+
+
+>>> CKA (Administration)
+>> what is kubernetes
+	
+
+
+                      replicas moved to all worker nodes
+                     ------------------------------------
+                      deployments managed by replicas
+	                 ---------------------------------------
+                     pods managed by Deployments=application
+                     -------------------------
+                     containers managed by pods
+                         ----------  
+                         container
+                        -----------  
+control             worker     worker    worker
+ node                node       node     node
+
+
+
+>>> kubernetes api obejects:-
+		
+		++ Api objects:-
+		+ pods
+		+ deployments. these all are api objects.
+
+## where api objects stored :-
+>> etcd
+>> etcd is a data base and key value.
+
+## how to call api objects :-
+>> using restapi calls
+>> api objects to create 
+        ++ kubectl
+        ++ kubernets dashboard
+        ++ curl GET
+        ++ curl POST
+
+## minikube installation of kubernetes
+>> kubectl get pods -n kube-system
+note: which pods are running
+>> kubectl get pods
+>> kubens
+note: it is default namespaces
+>> kubectl get pods -n kube-system
+>> kubectl api-resources | less
+note: it will show all the api-resources
+
+
+>>>> kubernetes architecture:-
+## kubecontrol manager
+	++ it will manages the current state of the cluster.
+
+## kube Api-server
+    ++ etcd
+    ++ etcd is key-value store
+    ++ key-value store will keep all cluster current state.
+    ++ api-server is front end of the cluster.
+    ++ using rest operations to connect etcd to api-server
+
+## kube scheduler
+	++ specific nodes pina shedule the pods using kube scheduler
+	++ labels
+	++ taints
+	++ tolerance
+++ worker node containes kubelet and kubeproxy.
+++ kubelet:- kubelet passes the request to the container engine.
+++ kubeproxy uses iptables to provide a interface.
+++ container runtime is takescare of actual running.
+++ container runtime runs inside worker node
+------------------------------------------------------------
+>>> CKA (Administration)
+>>>> k8s installation options
+
+>>> 2 masters and 3 worker nodes.
+>>> AWS Eks
+
+>> k3D goto search google
+k3d.io
+
+>> kind kubernetes goto search google
+>> minikube goto search google
+>> kubeadm installation
+>> kubectl installation
+note: kubectl manage your clusters
+------------------------------------------------------------
+>>> CKA (Administration)
+>>>> API Options ,Commands ,YAML
+
+>> kubectl auth can-i
+>> kubectl auth can-i create deployments
+>> kubectl auth can-i create deployments --as jai
+>> kubectl auth can-i create deployments --namespace secret
+>> kubectl auth can-i create deployments --as jai --namespace secret
+
+## Core kubernetes objects
+
+## Apis Explore
+>> kubectl api-resources
+note: it will show all the groups.
+>> kubectl proxy
+>> curl 
+note: it will show all the group information(api's)
+curl http://localhost:8001/apis
+>> kubectl api-versions
+note: it will show all current api versions
+
+practical session:-
+-------------------
+>> kubectl api-resources
+>> kubectl api-resources | less
+>> kubectl explain events | less
+>> kubectl explain pods | less
+>> pod:-
+Pod is a collection of containers that can run on a host. This resource is created by clients and scheduled onto hosts.
+>> kubectl api-versions
+
+## learn kubectl commands
+## learn kubeadm commands
+
+>> kubectl cluster-info
+note : test the proper way to install or not.
+
+>> kubectl manage current configuration
+note: home directory
+      ~/.kube/config -> current configuration
+>> kubectl config view
+note: check the current configuration
+
+>> Bash completion
+>> install the package bash completion
+>> kubectl completion bash
+
+practical session:-
+------------------
+>> kubectl cluster-info
+note: to check the proper way to install or not.
+
+>> kubectl config view
+note: it will show all the configurations
+
+Redhat:
+>> yum install bash-completion
+
+ubuntu:
+>> apt-get install bash-completion
+
+>> kubectl completion bash
+>> kubectl completion bash >> ~/.bashrc
+note: bash completion is move to bashrc file.
+
+>> make it perminent as bash completion
+>> cd /etc/bash_completion.d/
+>> kubectl completion bash > /etc/bash-completion.d/kubectl
+
+
+>> kubectl create deployment --image=nginx mynginx
+>> 
+
+
+## How to use yaml files
+
+>> vi busybox.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox2
+  namespace: default
+  labels:
+    app: busybox
+spec:
+  containers:
+  - name: busy
+    image: busybox
+    command:
+      - sleep
+      - "3600"
+
+>> kubectl explain pod
+>> kubectl explain pod.spec
+>> kubectl explain pod.spec | less
+>> kubectl explain pod.spec.containers | less
+
+>> kubectl create -f busybox.yaml
+>> kubectl get pods
+>> vi busybox.yml
+note: namespace = default
+>> kubectl get pods --namespace default
+note: namaspace created
+
+## create api objects using curl
+
+>> kubectl proxy --port=8001 &
+>> curl http://127.0.0.1:8001/version
+>> curl http://127.0.0.1:8001/api/v1/namespaces/default/pods
+note: default namespace running the pods
+>> kubectl get pods --namespace default
+
+# Delete the busybox2
+>> curl -XDELETE http://127.0.0.1:8001/api/v1/namespaces/default/pods/busybox2
+
+>> kubectl get pods --namespace  default
+note: curl command uses to manage the api objects.
+
+### etcd
+ubuntu:-
+>> apt-get install etcd
+
+Redhat:-
+>> yum install etcd
+
+>> etcdctl -h
+>> ETCDCTL_API=3 etcdctl -h
+note: version 3
+
+------------------------------------------------------------
+>>>> Deployments, STS, Rolling Updates
+
+>>> pods using deployments
+ ##  what is namespaces
+ ##  manage pods and deployments
+ ##  scalability
+ ##  labels & annotations
+ ##  Rolling updates
+ ##  Deployment history
+ ##  what is init containers and importance of init containers.
+ ##  stateful sets
+ ##  what is demon sets
+
+
+#### what is namespaces
+++ namespaces using for resource separation
+++ namespace got linux kernal
+++ advantage of namespace is resource separation
+
+>> default-namespaces[4] 
+   ++ default
+   ++ kube-node-lease
+   ++ kube-public
+   ++ kube-system
+   note: all infrastructure pods are available
+
+>> check the namespaces
+  ++ kubectl get ns
+  ++ kubectl get all --all-namespaces
+  ++ kubectl get pods --all-namespaces
+  ++ kubectl get deployments --all-namespaces   
+
+>> create a namespace
+  ++ kubectl create ns <namespace-name>
+  ++ kubectl create ns ttt
+
+>> check the namespace
+  ++ kubectl describe ns ttt
+  ++ kubectl get ns ttt -o yaml
+
+practical session:-
+-------------------
+
+>> kubectl  get ns
+note: it will show all namespaces
+>> kubectl create ns ttt
+note: create  a namespace
+>> kubectl get ns
+>> kubectl describe ns ttt
+>> kubectl get ns ttt -o yaml
+
+#### managing pods and deployments    
+
+++ every pod will have own ipaddress
+++ kubernetes manages pods and pods inside containers
+++ deployment creates replicaset
+++ replicaset manages replicas
+++ 
+
+>> kubectl create deployment --image=nginx mynginx
+note: created nginx deployment
+>> kubectl get deployments.apps
+note: it will show deployments
+>> kubectl get all
+note: it will show all deployments
+>> kubectl delete replicaset.apps/mynginx-6hhesdw
+note: delete the replica set
+>> kubectl get all
+>> kubectl get deployments.apps mynginx -o yaml | less
+
+## How to use yaml files in kubernetes
+>> kubectl create deployment -h
+
+## how to create yaml files
+>> kubectl create deployment --dry-run=client --image=nginx --output=yaml mynginx > mynginx.yml
+>> vi mynginx.yml
+>> kubectl get deployments.apps
+>> kubectl scale deployment mynginx --replicas=3
+## increase the scaleup
+>> kubectl scale deployment mynginx --replicas=3
+>> kubectl get deployments.apps
+>> kubectl get rs        (#replicasets) 
+>> kubectl get pods
+>> kubectl delete pod mynginx-5fskjkskj-g73838
+note: delete the pod it will recreate
+>> kubectl get rs
+>> kubectl get pods
+>> kubectl edit deployments.apps mynginx
+note: edit my deployments
+change replicas =4
+>> kubectl get pods
+>> kubectl get rs
+>> kubectl get deployments.apps
+
+#### labels & annotations
+   ++ labels using to make different obejects.
+   ++ 
+>> kubectl get deployments.apps --show-labels
+>> kubectl get pods --show-labels
+>> kubectl label deployments.apps mynginx dev=learning
+>> kubectl get pods --show-labels
+>> kubectl get deployments.apps --show-labels
+>> kubectl get deployments.apps --selector dev=learning
+>> kubectl get all --selector dev=learning
+>> kubectl run testnginx --image=nginx --replicas=3
+>> kubectl get pods --show-labels
+>> kubectl label pod mynginx-5behdjejj-6643d app-; kubectl get pods
+note: it's removing
+>> kubectl get pods --show-labels
+>> kubectl get rs
+
+
+#### Rolling updates
+
+deployments -> Replicasets -> pod1,pod2,pod3
+
+>> kubectl get deployments.apps mynginx -o yaml | less
+>> kubectl explain deployments.spec.strategy
+>> kubectl explain deployments.spec.strategy.rollingUpdate
+>> kubectl rollout -h
+>> vi rolling.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadara:
+  name: rolling-nginx
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      name: nginx
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.8
+
+>> kubectl create -f rolling.yaml
+>> kubectl rollout history deployment
+>> kubectl edit deployments.apps rolling-nginx
+change image: nginx:1.15
+>> kubectl rollout history deployment
+>> kubectl get all
+>> kubectl get pods --show-labels
+>> kubectl get rs
+>> kubectl rollout history deployment
+>> kubectl rollout history deployment rolling-nginx
+>> kubectl rollout history deployment rolling-nginx --revision=1
+>> kubectl rollout history deployment rolling-nginx --revision=2
+>> kubectl rollout undo deployment rolling-nginx --to-revision=1
+>> kubectl get rs
+>> kubectl get pods
+>> kubectl rollout undo deployment rolling-nginx --to-revision=2
+>> kubectl get pods
+>> kubectl rollout history deployment rolling-nginx
+>> kubectl rollout history deployment rolling-nginx --revision=3
+>> kubectl rollout history deployment rolling-nginx --revision=4
+------------------------------------------------------------
+#### what is init containers and importance of init containers.
+                   pod
+        --------------------
+        |                  |
+        | container1       |
+        |                  |
+        |      container2  |
+        --------------------
+
+container1 = main container
+container2 = init container
+
+note: first runs the init container after main container running.
+
+>> vi init.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: initpod
+spec: 
+  containers:
+  - name: after-init
+    image: busybox
+    command: ['sh', '-c', 'echo its running! && sleep 3600']
+  initContainers:
+  - name: init-myservice
+    image: busybox
+    command: ['sh', '-c', 'until nslookup myservice; do echo waiting for myservice; sleep 2; done;']
+
+>> kubectl create -f init.yaml
+>> kubectl get pods
+>> kubectl describe pod initpod
+>> kubectl get pods
+>> kubectl get svc
+>> kubectl expose deployment mynginx --port=80 --name=myservice
+>> kubectl get svc
+>> kubectl get pods
+>> vi init-container.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-demo
+  labels:
+    app: init-demo
+spec:
+  containers:
+  - name: demo-container
+    image: busybox
+    command: ['sh', '-c', 'sleep 3600']                   
+  initContainers:
+  - name: init-container
+    image: busybox
+    command: ['sh','-c', 'sleep 30']
+
+>> kubectl create -f init-container.yaml
+>> kubectl get pods
+
+
+#### Stateful sets
+    ++ stateful sets are like deployments 
+
+>> kubectl get pv
+>> vi stateful.yaml
+apiVersion: v1            
+kind: Service             # this is headless service
+metadata:
+  name: nginx             
+  labels:
+    app: nginx
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None         # create network id
+  selector:
+    app: nginx
+---                  
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: web
+spec:
+  selector:
+    matchLabels:
+      app: nginx # has to match
+      .spec.template.metadata.labels
+  serviceName: "nginx"
+  replicas: 3 # by default is 1
+  template:
+    metadata:
+      labels:
+        app: nginx # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: nginx
+        image: k8s.gcr.io/nginx-slim:0.8
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: www
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ] 
+      storageClassName: "my-storage-class"
+      resources:
+        requests:
+          storage: 1Gi
+
+#### Demonset
+    ++ one copy of pod into all nodes
+    ++ i have 3 nodes
+    ++ one copy of pod deploy into all 3 nodes
+
+>> kubectl get nodes
+>> vi daemonset-fluentd.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd-elasticsearch
+  namespace: kube-system
+  labels:
+    k8s-app: fluentd-logging
+spec:
+  selector:
+    matchLabels:
+      name: fluentd-elasticsearch
+  template:
+    metadata:
+      labels:
+        name: fluentd-elasticsearch
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      containers:
+      - name: fluentd-elasticsearch
+        image: quay.io/fluentd_elasticsearch/fluentd:v2.5.2
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
+
+>> kubectl create -f daemonset-fluentd.yaml
+>> kubectl get daemonset
+>> kubectl get daemonset --namespace kube-system
+------------------------------------------------------------
+
+#### Storage, PV, PVCs, Secrets
+
+POD
+-----------------
+spec            |
+volume          | 
+                |
+       |vol|-------->non-persistant
+---------|------|                                       
+    -----|----------------
+    |         |          |
+  pvc       configmap   secrets 
+
+
+++ to make it volume is persistent to using microservices.
+++ create 2 containers
+
+>> vi volumes.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sharevolumes
+spec:
+  containers:
+  - name: centos1
+    image: centos:7
+    command:
+      - sleep
+      - "3600"
+    volumeMounts:
+    - mountPath: /centos1
+      name: test
+  - name: ubuntu
+    image: ubuntu:latest
+    command:
+      - sleep
+      - "3600"
+    volumrMounts:
+    - mountPath: /ubuntu
+      name: test
+  restartPolicy: Always
+  volumes:
+    - name: test
+      emptyDir: {}
+
+>> kubectl create -f volumes.yaml
+>> kubectl get pods
+>> kubectl exec -it sharedvolumes -- /bin/bash
+>> ls
+>> touch centos1/helloworld
+>> exit
+>> kubectl exec -it sharedvolumes -c ubuntu -- /bin/bash
+>> ls
+>> cd ubuntu
+>> ls
+helloworld
+note: shared the volume with in the pod
+>> exit
+# what are the volumes in pods
+>> kubectl explain pods.spec.volumes
+>> 
+
+## how to create Pv:-
+>> vi pv-cka.yaml
+kind: PersistentVolume
+apiVersion: v1
+metadata: 
+  name: pv-claim
+  labels:
+      type: local
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mydata"
+
+++ hostpath: volume is created with in the node.
+++ it works only single node (testing purpose)
+>> kubectl explain pv.spec
+>> kubectl create -f pv-cka.yaml
+>> kubectl get pv
+>> vi pv-nfs.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /data
+    server: myserver
+    readOnly: false
+
+>> kubectl create -f pv-nfs.yaml
+>> kubectl get pv
+>> vi pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+>> vi pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pv-claim
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+
+>> kubectl get pv          
+>> kubectl delete pv pv-nfs
+>> kubectl get pv
+>> kubectl create -f pvc.yaml
+>> kubectl get pvc
+>> kubectl edit pvc pv-claim
+note: edit the 
+  accessModes:
+  - ReadWriteOnce
+>> kubectl delete pvc pv-claim
+>> vi pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+>> kubectl create -f pvc.yaml
+>> kubectl get pv
+>> kubectl get pvc
+>> vi pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi
+
+>> vi pv-cka.yaml
+kind: PersistentVolume
+apiVersion: v1
+metadat:
+  name: pv-claim
+  labels:
+      type: local
+spec:
+  capacity:
+    storage: 300Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mydata"
+
+>> kubectl create -f pv-cka.yaml
+>> kubectl get pv
+>> kubectl create -f pvc.yaml
+>> kubectl get pvc
+>> vi pv-cka.yaml
+kind: PersistentVolume
+apiVersion: v1
+metadat:
+  name: pv-claim-2
+  labels:
+      type: local
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mydata"
+
+>> kubectl create -f pv-cka.yaml
+>> kubectl get pvc
+>> kubectl get pv
+>> vi pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pv-claim-2
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+ 
+>> kubectl create -f pvc.yaml
+>> kubectl get pv
+>> kubectl get pvc
+
+
+>>> how assign pvcs to pods
+
+>> vi pv-pod.yaml
+kind: Pod
+apiVersion: v1
+metadata:
+   name: pv-pod
+spec:
+  volumes:
+    - name: pv-storage
+      persistentVolumeClaim:
+        claimName: pv-claim
+  containers:
+    - name: pv-container
+      image: nginx
+      ports:
+        - containerPort: 80
+          name: "http-server"
+      volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          name: pv-storage
+
+>> kubectl get pvc
+>> kubectl create -f pv-pod.yaml
+>> kubectl get pods
+>> kubectl describe pod pv-pod
+-----------------------------------------------------------
+>>> troubleshooting issues
+Example1:
+>> vi pv-pod.yaml
+kind: Pod
+apiVersion: v1
+metadata:
+   name: pv-pod-ts
+spec:
+  volumes:
+    - name: pv-storage
+      persistentVolumeClaim:
+        claimName: pv-claim-3
+  containers:
+    - name: pv-container
+      image: nginx
+      ports:
+        - containerPort: 80
+          name: "http-server"
+      volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          name: pv-storage
+           
+>> kubectl create -f pv-pod.yaml
+>> kubectl get pods
+>> kubectl describe pod pv-pod-ts
+message: persistentvolumeclaim "pv-claim-3" not found
+>> kubectl get pvc
+
+Example 2:
+
+>> vi pv-cka.yaml
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: pv-claim-3
+  labels:
+      type: local
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mydata"
+
+>> kubectl create -f pv-cka.yaml
+>> kubectl get pv
+>> vi pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pv-claim-3
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+>> kubectl create -f pvc.yaml
+>> kubectl get pvc
+>> kubectl get pv
+>> kubectl get pods
+>> kubectl describe pod pv-pod-ts
+-----------------------------------------------------------
+
+    >>> storage class
+
+>> kubectl get pv
+>> kubectl get nodes
+>> kubectl get sc      
+note: sc means storage class
+>> kubectl get nodes
+>> kubectl get sc
+>> kubectl get pvc
+>> kubectl get pv
+>> kubectl create -f pv-pod.yaml
+>> kubectl get pvc
+>> kubectl get pv
+>> kubectl get pods
+>> kubectl describe pod pv-pod-ts
+>> kubectl get pv
+>> kubectl create -f pvc.yaml
+>> kubectl get pvc
+>> kubectl get pv
+>> kubectl get pods
+
+>> vi volumeclaimtemplate.yaml
+kind: StstefulSet
+metadata:
+  name: web
+spec: 
+  selector:
+    matchLabels:
+      app: nginx # has to match .spec.template.metadata.labels
+  serviceName: nginx
+  replicas: 3 # by default is 1
+  template:
+    metadata:
+      labels:
+        app: nginx # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: nginx
+        image: k8s.gcr.io/nginx-slim:0.8
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: www
+          mountPath: /usr/share/nginx/html
+
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ ReadWriteOnce ] 
+      storageClassName: my-storage-class
+      resources:
+        requests:
+          storage: 1Gi
+
+>> kubectl create -f volumeclaimtemplate.yaml
+>> kubectl get pods
+>> kubectl get sc
+>> kubectl get pvc
+>> kubectl get pv
+
+ref: kubernetes.io/docs/concepts/storage/storage-classes/
+
+>> vi sc.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: my-storage-class
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+
+>> kubectl create -f sc.yaml
+>> kubectl get sc
+>> kubectl get nodes
+>> vi volumeclaimtemplate.yaml
+kind: StstefulSet
+metadata:
+  name: web
+spec: 
+  selector:
+    matchLabels:
+      app: nginx # has to match .spec.template.metadata.labels
+  serviceName: nginx
+  replicas: 3 # by default is 1
+  template:
+    metadata:
+      labels:
+        app: nginx # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: nginx
+        image: k8s.gcr.io/nginx-slim:0.8
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: www
+          mountPath: /usr/share/nginx/html
+
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ ReadWriteOnce ] 
+      #storageClassName: my-storage-class
+      resources:
+        requests:
+          storage: 1Gi
+   
+>> kubectl create -f volumeclaintemplate.yaml
+>> kubectl get pods
+>> kubectl describe pod web-0
+>> kubectl get pods
+>> kubectl get pvc
+>> kubectl get pv
+>> kubectl get pods
+>> kubectl delete statefulsets.apps web
+>> kubectl get pods
+>> kubectl get pvcs
+>> kubectl get pvc
+note: before stateful sets you need to delete your pvc.
+>> kubectl delete pvc www-web-1
+>> kubectl delete pvc www-web-0
+>> kubectl get pvc
+>> kubectl get pv
+>> Remove the pv
+>> kubectl delete pv pvc-kfdsdkjdskjkj      (#www-web-0)
+>> kubectl delete pv pvc-fdsjdjhfdsjh       (#www-web-1)
+>> kubectl get pv
+>> kubectl get pvc
+>> kubectl get pods
+>> kubectl delete pod pv-pod-ts
+>> kubectl get pods
+>> kubectl get pvc
+>> kubectl get pv
+>> kubectl delete pvc pv-claim-3
+>> kubectl delete pv pvc-fjdsds83jslk
+>> kubectl get pv
+note: no more pv
+>> kubectl get pvc
+note: no more pvc
+
+
+#### ConfigMaps
+
+>> pods are deploying through deployment.
+   >> configmaps describe
+       ++ files
+       ++ dir
+       ++ vars
+   >> volume
+       ++ pv
+       ++ pvc
+ >> config map is using to call the volume.
+ >> vars is calling to env
+ >> secretes
+     ++ secretes are encoded with base64
+
+
+>> vi nginx-custom-config.conf
+server {
+    listen        8888;
+    server_name   localhost;
+    location / {
+        root   /usr/share/nginx/html;
+        index index.html index.htm;
+    }
+}
+
+>> kubectl create cm nginx-cm --from-file nginx-custom-config.conf
+note: cm means config map
+>> kubectl get cm
+>> kubectl get cm nginx-cm -o yaml
+apiVersion: v1
+data:
+  nginx-custom-config.conf: |
+    server {
+        listen       8888;
+        server_name  localhost;
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+    }
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2021-05-07T09:52:53Z"
+  managedFields:
+  - apiVersion: v1
+    fieldsType: FieldsV1
+    fieldsV1
+      f:data:
+        .: {}
+        f:nginx-custom-config.conf: {}
+    manager: kubectl
+    operation: Update
+    time: "2021-05-07T09:52:53Z"
+  name: nginx-cm
+  namespace: ttt
+  resourceVersion: "453959"
+  selfLink: /api/v1/namespaces/ttt/configmaps/nginx-cm
+  uid: 16a0236c-9342-4df4-ad24-de41f861d647
+
+>> vi nginx-cm.yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-cm
+  labels:
+    role: web
+spec:
+  containers:
+  - name: nginx-cm
+    image: nginx
+    volumeMounts:
+    - name: conf
+      mountPath: /etc/nginx/conf.d
+  volumes:
+  - name: conf
+    configMap:
+      name: nginx-cm
+      items:
+      - key: nginx-custom-config.conf
+        path: default.conf
+
+>> kubectl create -f nginx-cm.yml
+>> kubectl get pods
+>> kubectl exec -it nginx-cm -- sh
+# bash
+> cat /etc/nginx/conf.d/default.conf
+# exit
+> exit
+>>
+
+### how to pull variables
+# create configmap
+>> kubectl create cm myconfig --from-literal=color=red
+>> vi test-cm-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+spec:
+  containers:
+  - name: test
+    image: nginx
+    env:
+    - name: COLOR
+      valueFrom:
+        configMapKeyRef:
+          name: myconfig
+          key: color
+   restartPolicy: Never
+   
+>> kubectl create -f test-cm-pod.yaml
+>> kubectl get pod
+>> kubectl exec -it test-pod -- sh
+# echo $COLOR
+# exit
+>>
+
+### what are the secrets
+
+secrets is encoded version and you can see to decoded it.
+
+3 types of secrets
+   ++ docker-registry
+   ++ TLS
+   ++ Generic
+# generic secret
+>> kubectl create secret generic secretstuff --from-literal=password=password --from-literal=user=India
+>> kubectl get secrets secretstuff -o yaml
+
+---------------------------------------------------------
+## practice purpose(mysql)
+>> vi pod-secret.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql
+  namespace: default
+spec:
+  containers:
+  - name: mysql
+    image: mysql:latest
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      valuesFrom:
+        secretkeyRef:
+          name: mysql
+          key: password
+-----------------------------------------------------------
+>> vi pod-secret.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secretpod
+  namespace: ttt
+spec:
+  containers:
+  - name: secretpod
+    image: busybox
+    command:
+      - sleep
+      - "3600"
+    volumeMounts:
+    - mountPath: /secretstuff
+      name: secret
+   volumes:
+   - name: secret
+     secret:
+       secretName: secretstuff
+
+>> kubectl create -f pod-secret.yaml
+>> kubectl describe pod secretpod
+>> kubectl exec -it secretpod -- sh
+# ls
+# cat secretstuff/user
+# cat secretstuff/password
+# exit
+>> kubectl create secret generic mysql --from-literal=password=trietree
+
+>> vi pod-secret-as-var.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mymysql
+  namespace: default
+spec:
+  containers:
+  - name: mysql
+    image: mysql:latest
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      valueFrom:
+        secretFrom:
+          name: mysql
+          key: password
+
+>> kubectl create -f pod-secret-as-var.yaml
+>> kubectl get secrets mysql -o yaml
+>> kubectl exec -it mymysql env
+
+this is encodeing and decoding
+
+-----------------------------------------------------------
+
+37- kubernetes networking for devops
+
+#### what are all the services in kubernetes
+
+# create a deployment
+>> kubectl create deployment nginxsvc --image=nginx
+>> kubectl scale deployment nginxsvc --replicas=3
+>> kubectl get pods
+>> kubectl get svc
+>> kubectl expose deployment nginxsvc --port=80
+>> kubectl get svc
+>> kubectl describe svc nginxsvc
+>> kubectl get pods nginxsvc-76dkjhsfmn33-jdj39 --show-labels
+note: nginxsvc-76k is to get from kubectl get pods inside first nginxsvc 
+>> kubectl get pods
+>> curl http://172.21.177.224:80
+>> kubectl exec -it nginxsvc-76ddfsnmfdmn-jdj39 -- bash
+note: nginxsvc-76ddfsnmfdmn-jdj39 is a pod.
+# curl http://172.21.177.224:80
+# exit
+>> kubectl get svc
+>> kubectl edit svc nginxsvc
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2022-05-04"
+  labels:
+    app: nginxsvc
+  name: nginxsvc
+  namespace: test
+  resourceVersion: "145670657"
+  selfLink: /api/v1/namespaces/test/services/nginxsvc
+  uid: a565b028-35bb-46fd-92db-667decbae553
+spec:
+  ClusterIP: 172.21.177.224
+  ports:
+  - port: 80
+    protocol: TCP
+    nodePort: 32000
+    targetPort: 80
+  selector:
+    app: nginxsvc
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}
+
+>> kubectl get svc
+
+note: nodeport is to access to minikube 
+curl http://nopeip:nodeport
+
+>> kubectl edit svc nginxsvc
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2022-05-04"
+  labels:
+    app: nginxsvc
+  name: nginxsvc
+  namespace: test
+  resourceVersion: "145670657"
+  selfLink: /api/v1/namespaces/test/services/nginxsvc
+  uid: a565b028-35bb-46fd-92db-667decbae553
+spec:
+  ClusterIP: 172.21.177.224
+  ports:
+  - port: 80
+    protocol: TCP
+    nodePort: 32000
+    targetPort: 80
+  selector:
+    app: nginxsvc
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+
+>> kubectl get svc
+>> kubectl edit svc nginxsvc
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2022-05-04"
+  labels:
+    app: nginxsvc
+  name: nginxsvc
+  namespace: test
+  resourceVersion: "145670657"
+  selfLink: /api/v1/namespaces/test/services/nginxsvc
+  uid: a565b028-35bb-46fd-92db-667decbae553
+spec:
+  ClusterIP: 172.21.177.224
+  ports:
+  - port: 80
+    protocol: TCP
+    nodePort: 32000
+    targetPort: 80
+  selector:
+    app: nginxsvc
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}
+
+>> kubectl get svc
+
+
+#### How ingress works
+
+
+
+                        Loadbalancer
+                ingress------------->svc 
+
+>> kubectl get pods
+>> kubectl get svc
+>> vi nginxsvc-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginxsvc-ingress
+  annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+  - host: nginxsvc.info
+    http:
+      paths:
+      - path: /
+        pathType: prefix
+        backend:
+          service:
+            name: nginxsvc
+            port:
+              number: 80
+      - path: /hello
+        pathType: Prefix
+        backend:
+          service:
+            name: newdep
+            port:
+              number: 8080
+
+
+>> kubectl apply -f nginxsvc-ingress.yaml
+>> kubectl get ing
+>> curl http://nginxsvc.info
+>> curl http://nginxsvc.info/hello
+>> kubectl get svc
+>> kubectl describe ing nginxsvc-ingress
+>> kubectl create deployment newdep --image=gcr.io/google-samples/hello-app:2.0
+note: deploy the hello-app
+>> kubectl get pods
+>> kubectl expose deployment newdep --port=8080
+note: expose the port=8080
+>> kubectl get svc
+>> kubectl get ing
+>> kubectl describe ing nginxsvc-ingress
+>> curl http://nginxsvc.info/hello
+>> kubectl get svc
+>> kubectl get pods
+>> kubectl get ing
+note: ing means ingress
+>> curl http://nginxsvc.info
+>> curl http://nginxsvc.info/hello
+>> 
+
+-----------------------------------------------------------
+38 - manageing-scheduling-kubernetes
+
+>> kubectl get nodes
+kind-control-plane
+kind-worker
+kind-worker2
+note: this is kind cluster
+>> kubectl label nodes kind-worker2 disktype=ssd
+>> kubectl get pods
+>> kubectl apply -f selector-pod.yaml
+>> kubectl get pods
+>> kubectl get pods -o wide
+>> kubectl get pods
+>> kubectl describe pod nginx
+>> kubectl explain pod.spec.affinity
+>> kubectl explain pod.spec.affinity.nodeAffinity
+>> vi with-node-aff.yaml
+apiVesion:v1
+kind: Pod
+metadata:
+  name: with-node-affinity
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/e2e-az-name
+            operator: In
+            values:
+            - e2e-az1
+            - e2e-az2
+      preferredDuringSchedulingIgnoreDuringExecution:
+      - weight: 1
+        preference: 1
+          matchExpressions:
+          - key: another-node-label-key
+            operator: In
+            values:
+            - another-node-label-value
+  containers:
+  - name: with-node-affinity
+    image: k8s.gcr.io/pause:2.0
+
+>> kubectl apply -f with-node-aff.yaml
+>> kubectl get pods
+>> kubectl describe pod with-node-aff.yaml
+>> vi with-node-aff.yaml
+apiVesion:v1
+kind: Pod
+metadata:
+  name: with-node-affinity
+spec:
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoreDuringExecution:
+      - weight: 1
+        preference: 
+          matchExpressions:
+          - key: another-node-label-key
+            operator: In
+            values:
+            - another-node-label-value
+  containers:
+  - name: with-node-affinity
+    image: k8s.gcr.io/pause:2.0
+
+>> kubectl apply -f with-node-aff.yaml
+>> kubectl get pods
+>> kubectl delete -f with-node-aff.yaml
+>> kubectl apply -f with-node-aff.yaml
+>> kubectl get pods
+>> kubectl describe pod with-node-aff.yaml
+
+## pod affinity
+>> vi pod-with-pod-affinity.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: with-pod-affinity
+spec:
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: security
+            operator: In
+            values:
+            - S1
+        topologyKey: failure-domain.beta.kubernetes.io/zone
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoreDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: security
+              operator: In
+              values:
+              - S2
+          topologyKey: failure-domain.beta.kubernetes.io/zone
+  containers:
+  - name: with-pod-affinity
+    image: k8s.gcr.io/pause:2.0
+
+>> kubectl apply -f with-podaff.txt
+>> kubectl get pods
+>> kubectl describe pod with-pod-affinity
+>> vi redis-with-pod-affinity.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-cache
+spec:
+  selector:
+    matchLabels:
+      app: store
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: store
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - store
+            topologyKey: "kubernetes.io/hostname" 
+      containers:
+      - name: redis-server
+        image: redis:3.2-alpine
+
+>> kubectl apply -f redis-anti-pod-aff.txt
+>> kubectl get pods
+>> kubectl describe pod redis-cache-56cdsadskjh-4pjhd
+>> kubectl get nodes
+ 
+##  Taint and tolerations
+
+>> how to enable the taints
+>> kubectl get nodes
+>> kubectl taint nodes kind-worker example-key=value:NoSchedule
+>> kubectl describe node kind-worker
+>> kubectl create deployment nginx-taint --image=nginx
+note: deployment created
+>> kubectl scale deployment nginx-taint --replicas=3
+>> kubectl get pods
+>> kubectl get pods -o wide
+>> 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-toleration
+  labels:
+    env: test
+spec:
+  containers:
+  - name: nginx-toleration
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  tolerations:
+  - key: "example-key"
+    operator: "Exists"
+    effect: "NoSchedule"
+
+>> kubectl apply -f taint-toleration.txt
+>> kubectl get pods -o wide
+>> kubectl get deployment
+>> kubectl delete deployment nginx-taint
+>> kubectl delete deployment redis-cache
+>> kubectl taint nodes kind-worker example-key:NoSchedule-
+>> kubectl create deployment nginx-taint --image=nginx --replicas=3
+>> kubectl get pods -o wide
+>> kubectl delete deployment nginx-taint
+>> kubectl delete pod nginx-toleration
+>> kubectl delete pod nginx
+>> kubectl delete pod with-node-affinity
+>> kubectl delete pod with-pod-affinity
+>> kubectl get pods
+>>           
+>>                          
+
+
+
+

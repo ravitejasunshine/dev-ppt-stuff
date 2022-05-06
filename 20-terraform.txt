@@ -1,0 +1,1628 @@
+20-Terraform and aws introduction:-
+-------------------------------------------------------------
+>> what is terraform?
+>> why we use terraform?
+++ automate and manage our infrasture
+++ infrasture like servers,vpc,storages,kubernetes,
+++ infrasture automation tool like terraform.
+++ aws=> cloud-formation
+
+>>>terraform:-
+++ open source platform
+++ declarative type
+++ automate using terraform
+++ k8s->eks 
+++ how to launch private vpc
+++ how to launch ec2 server
+++ how to launch securities
+++ how make vpc
+++ how to launch servers 
+++ creating IAM rules
+++ creating users and permissions
+++ install eks
+++ install dockers
+++ install containers Ecs
+++ try to automate with terraform and you can use it ansible.
+++ ansible is using to deploy your application and configure, install software.
+++ difference b/w ansible and terraform ,call it is infrastructure has a code.
+++ infrasture provision for using terraform.
+++ terraform is using to deploy the applications like docker some applications.
+++ ansible is configuration tool like deploy the applications ,install/update/delete the softwares.
+
+goto google >> terraform providers
+++ how to connect providers
+++ tf-config      desired state 
+     |
+ create,config
+     |
+   current state of setup.
+	 |
+   core	 
+
+note : terraform always checks the desired state and current state.
+
+>> terraform configuration files.
+
+>> terraform providers.
+>> what is declarative syntax in terraform.
+
+	>>> AWS
+>> why aws?
+>> what is cloud
+>> what is aws
+
+---------------------------------------------------------	
+            >>>> 21) AWS IAM introduction
+>> authentication and authorization
+>> how to access iam
+>> iam https api
+>> iam features
+-----------------------------------------------------------
+            >>>> 22) IAM hands-on aws
+>> create a IAM account
+
+-----------------------------------------------------------
+            >>>> 23) AWS IAM importance
+
+>> aws IAM
+>> cloud shell
+++ cloud shell available regions
+>> Aws cli configure
+
+------------------------------------------------------------
+              >>>> 24-25-26 AWS EC2 instance Importance
+
+>> ec2 instance life cycle
+>> EBS volumes and how to attach?
+>> EFS(elastic file system)
+>> NFS
+>> EBS attach only one instance with in the avialibity-zone.
+>> EFS attach multiple servers with in the different avilablility-zones.
+>> Efs works only linux boxes not in windows.
+
+
+>> what do you mean by High availailty and scalability.
+>> Autoscaling
+>> virtical scaling and horizontal scaling.
+>> High availailty and horizontal scaling(autoscaling and load balancing).
+
+
+>> launch ec2 server (##load balancer demo) 
+
+>> configure instance details
+## user data
+
+#!/bin/bash
+# install httpd
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd
+echo "<h1> Hello world </h1>"
+/var/www/html/index.html
+
+#copy the ip paste into browser
+
+goto loadbalancing -> load balancers-> create load balancer
+
+>> add security group
+
+>>> Load balancers
+### Application load balancer
+### Network load balancer
+### classic load balancer
+-----------------------------------------------------------
+                >>>> AwS ec2 importance (AWSLBS)
+
+>> aws->ec2->auto scaling groups
+>> cloud watch
+>> auto scaling
+>> auto scaling policies
+
+goto ec2 instance -> auto scaling -> launch configuration
+goto -> auto scaling groups
+
+>> auto scaling policies
+-----------------------------------------------------------
+             >>>> 28- awsasg->aws-lbs->awsvpc 
+vpc part-1             
+
+>> aws-vpc
+>> what is dns
+>> route53(create a domains)
+
+>> Vpc
+++ CIDR(classes into domain routeing)->ipv4
+
+google->cidr.xyz
+-----------------------------------------------------------
+                >>>> 29-awsasg->aws-lbs->awsvpc
+vpc part-2
+
+>> NACL (network access control list)
+++ it is a firewall
+>> vpc peering
+>> vpn
+++ transit gateway
+++ site-to-site-vpn
+
+topics:-
+---------
+cidr
+vpc
+subnet
+internet gateways
+route tables
+nat gateway 
+nacl
+security groups
+dns
+vpc-peering
+site-to-site vpn
+transit gateway
+s3
+rds
+-----------------------------------------------------------
+              >>>> 30- Terrafrom end-to-end-part-1
+
+### Installation of terraform
+>> https://learn.hashicorp.com/tutorials/terraform/install-cli
+>> install terraform
+>> registry.terraform.io/browse/provider
+
+main.tf:-
+---------
+
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+              
+>> terraform init
+>> ls -la
+>> what is resources and datasources
+
+### creating  provider aws, vpc and subnet.
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = "10.0.0.0/16"
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = "10.0.1.0/24"
+    availability_zone = "ap-south-1a"
+} 
+
+## add Data sources:-
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = "10.0.0.0/16"
+    tags = {
+        Name = "dev-vpc-01"
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = "10.0.1.0/24"
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+resource "aws_subnet" "dev-sn-2" {
+    vpc_id = data.aws_vpc.default_vpc.id
+    cidr_block = "172.31.48.0/20"
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-02"
+    }
+}
+
+>> terraform apply
+
+## how to remove resources
+++ Remove the subnet-02
+>> terraform destory -target tyoe.name
+>> terraform destory -target aws_subnet.dev-sn-2
+>>  or
+>> remove the code
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+resource "aws_subnet" "dev-sn-2" {
+    vpc_id = data.aws_vpc.default_vpc.id
+    cidr_block = "172.31.48.0/20"
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-02"
+    }
+}
+
+#### adding the subnet
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+resource "aws_subnet" "dev-sn-2" {
+    vpc_id = data.aws_vpc.default_vpc.id
+    cidr_block = "172.31.48.0/20"
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-02"
+    }
+}
+
+### difference between current state and desired state.
+>> terraform plan
+## current state is only removed code or any changes.
+## desire state is only the current code state.
+
+## desired state
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = "10.0.0.0/16"
+    tags = {
+        Name = "dev-vpc-01"
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = "10.0.1.0/24"
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+## current state
+
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+resource "aws_subnet" "dev-sn-2" {
+    vpc_id = data.aws_vpc.default_vpc.id
+    cidr_block = "172.31.48.0/20"
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-02"
+    }
+}
+
+
+### enable auto approve
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = "10.0.0.0/16"
+    tags = {
+        Name = "dev-vpc-01"
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = "10.0.1.0/24"
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+>> terraform apply -auto-approve
+
+## full code
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = "10.0.0.0/16"
+    tags = {
+        Name = "dev-vpc-01"
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = "10.0.1.0/24"
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+resource "aws_subnet" "dev-sn-2" {
+    vpc_id = data.aws_vpc.default_vpc.id
+    cidr_block = "172.31.48.0/20"
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-02"
+    }
+}
+
+>> terraform apply -auto-approve
+>> terraform destory
+## it will destory the all infrasture
+
+
+## terraform.tfstate
+++ it will store the current state of your terraform resoures.
+
+## backup file
+++ it will store the previous state.
+
+>> terraform apply -auto-approve
+>> terraform state
+++ it will show the all the list of your terraform.
+>> terraform state list
+
+### what are the output values
+
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = "10.0.0.0/16"
+    tags = {
+        Name = "dev-vpc-01"
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = "10.0.1.0/24"
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+>> terraform apply
+
+
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = "10.0.0.0/16"
+    tags = {
+        Name = "dev-vpc-01"
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = "10.0.1.0/24"
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+output "dev-vpc-id" {
+    value = aws_vpc.dev_vpc.id
+}
+
+output "dev-sn-1-id" {
+    value = aws_subnet.dev-sn-1.id
+}
+
+>> terraform apply
+>> terraform plan
+
+
+### terraform variables
+
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+variable "sn-cidr-block" {
+    description = "subnet cidr block"
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = "10.0.0.0/16"
+    tags = {
+        Name = "dev-vpc-01"
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+output "dev-vpc-id" {
+    value = aws_vpc.dev_vpc.id
+}
+
+output "dev-sn-1-id" {
+    value = aws_subnet.dev-sn-1.id
+}
+
+>> terraform apply
+>> Enter a value : 10.0.2.0/24
+            or
+>> terraform apply -var "sn-cidr-block=10.0.3.0/24"
+
+### create a terraform file
+>> terraform.tfvars
+sn-cidr-block = "10.0.1.0/24"
+
+>> terraform apply
+
+### terraform-variables 
+
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+variable "sn-cidr-block" {
+    description = "subnet cidr block"
+}
+
+variable "vpc-cidr-block" {
+    description = "vpc cidr block"
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = var.vpc-cidr-block
+    tags = {
+        Name = "dev-vpc-01"
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+
+output "dev-vpc-id" {
+    value = aws_vpc.dev_vpc.id
+}
+
+output "dev-sn-1-id" {
+    value = aws_subnet.dev-sn-1.id
+}
+
+>> terraform.tfvars
+sn-cidr-block = "10.0.2.0/24"
+vpc-cidr-block = "10.0.0.0/16"
+
+>> terraform apply
+
+### code ### 
+
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+variable "sn-cidr-block" {
+    description = "subnet cidr block"
+}
+
+variable "vpc-cidr-block" {
+    description = "vpc cidr block"
+}
+
+variable "env" {
+    description = "env to deploy"
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = var.vpc-cidr-block
+    tags = {
+        Name = var.env
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+
+output "dev-vpc-id" {
+    value = aws_vpc.dev_vpc.id
+}
+
+output "dev-sn-1-id" {
+    value = aws_subnet.dev-sn-1.id
+}
+
+
+>> terraform.tfvars
+env = "development"
+
+>> terraform apply
+
+### create a terraform file
+>> terraform-dev.tfvars
+sn-cidr-block = "10.0.2.0/24"
+vpc-cidr-block = "10.0.0.0/16"
+
+env = "development"
+
+>> terraform apply -var-file terraform-dev.tfvars
+
+>> terraform-dev.tfvars
+sn-cidr-block = "10.0.3.0/24"
+vpc-cidr-block = "10.0.0.0/16"
+
+env = "Staging" 
+
+>> terraform apply -var-file terraform-dev.tfvars
+
+### code ###
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+variable "sn-cidr-block" {
+    description = "subnet cidr block"
+    default = "10.0.6.0/24"
+}
+
+variable "vpc-cidr-block" {
+    description = "vpc cidr block"
+}
+
+variable "env" {
+    description = "env to deploy"
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = var.vpc-cidr-block
+    tags = {
+        Name = var.env
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+
+output "dev-vpc-id" {
+    value = aws_vpc.dev_vpc.id
+}
+
+output "dev-sn-1-id" {
+    value = aws_subnet.dev-sn-1.id
+}
+
+>> terraform-dev.tfvars
+## here remove the code
+
+>> terraform apply -var-file terraform-dev.tfvars
+
+### code ###
+
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+variable "sn-cidr-block" {
+    description = "subnet cidr block"
+    
+}
+
+variable "vpc-cidr-block" {
+    description = "vpc cidr block"
+}
+
+variable "env" {
+    description = "env to deploy"
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = var.vpc-cidr-block
+    tags = {
+        Name = var.env
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+
+output "dev-vpc-id" {
+    value = aws_vpc.dev_vpc.id
+}
+
+output "dev-sn-1-id" {
+    value = aws_subnet.dev-sn-1.id
+}
+
+>> terraform apply -var-file terraform-dev.tfvars
+
+### code ###
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+variable "sn-cidr-block" {
+    description = "subnet cidr block"
+    default = "10.0.6.0/24"
+}
+
+variable "vpc-cidr-block" {
+    description = "vpc cidr block"
+}
+
+variable "env" {
+    description = "env to deploy"
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = var.vpc-cidr-block
+    tags = {
+        Name = var.env
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+
+output "dev-vpc-id" {
+    value = aws_vpc.dev_vpc.id
+}
+
+output "dev-sn-1-id" {
+    value = aws_subnet.dev-sn-1.id
+}
+
+>> terraform apply -var-file terraform-dev.tfvars
+
+### code ###
+
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+variable "sn-cidr-block" {
+    description = "subnet cidr block"
+    default = "10.0.6.0/24"
+}
+
+variable "vpc-cidr-block" {
+    description = "vpc cidr block"
+}
+
+variable "env" {
+    description = "env to deploy"
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = var.vpc-cidr-block
+    tags = {
+        Name = var.env
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+
+output "dev-vpc-id" {
+    value = aws_vpc.dev_vpc.id
+}
+
+output "dev-sn-1-id" {
+    value = aws_subnet.dev-sn-1.id
+}
+
+>> terraform.tfvars
+here remove a code
+
+>> terraform apply -var-file terraform-dev.tfvars
+
+Enter a value: Development
+
+Enter a value : 10.0.0.0/16
+
+### code ###
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+variable "sn-cidr-block" {
+    description = "subnet cidr block"
+    default = "10.0.6.0/24"
+}
+
+variable "vpc-cidr-block" {
+    description = "vpc cidr block"
+    default = "10.0.0.0/16"
+}
+
+variable "env" {
+    description = "env to deploy"
+    default = "Development"
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = var.vpc-cidr-block
+    tags = {
+        Name = var.env
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+
+output "dev-vpc-id" {
+    value = aws_vpc.dev_vpc.id
+}
+
+output "dev-sn-1-id" {
+    value = aws_subnet.dev-sn-1.id
+}
+
+>> terraform apply -var-file terraform-dev.tfvars
+
+### what are the types:-
+### code ###
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+variable "sn-cidr-block" {
+    description = "subnet cidr block"
+    default = "10.0.6.0/24"
+    type = string
+}
+
+variable "vpc-cidr-block" {
+    description = "vpc cidr block"
+}
+
+variable "env" {
+    description = "env to deploy"
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = var.vpc-cidr-block
+    tags = {
+        Name = var.env
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+
+output "dev-vpc-id" {
+    value = aws_vpc.dev_vpc.id
+}
+
+output "dev-sn-1-id" {
+    value = aws_subnet.dev-sn-1.id
+}
+
+>> terraform.tfvars
+sn-cidr-block = ["10.0.2.0/24"]
+
+>> terraform apply
+
+### list format to pass the string values.
+### code ### 
+provider "aws" {
+    region = "ap-south-1"
+    access_key = ""
+    secret_key = ""
+
+}
+
+variable "cidr_blocks" {
+    type = list(string)
+}
+
+variable "sn-cidr-block" {
+    description = "subnet cidr block"
+    default = "10.0.6.0/24"
+    type = string
+}
+
+variable "vpc-cidr-block" {
+    description = "vpc cidr block"
+}
+
+variable "env" {
+    description = "env to deploy"
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = var.cidr_blocks[0]
+    tags = {
+        Name = var.env
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = var.cidr_blocks[1]
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+
+output "dev-vpc-id" {
+    value = aws_vpc.dev_vpc.id
+}
+
+output "dev-sn-1-id" {
+    value = aws_subnet.dev-sn-1.id
+}
+
+>> terraform.tfvars
+##remove the previous code
+cidr_blocks = ["10.0.0.0/16", "10.0.4.0/24"]
+
+>> terraform apply
+
+### How to work with environment variables.
+
+### code ###
+
+### code ### 
+provider "aws" {
+}
+
+variable "cidr_blocks" {
+    type = list(string)
+}
+
+variable "sn-cidr-block" {
+    description = "subnet cidr block"
+    default = "10.0.6.0/24"
+    type = string
+}
+
+variable "vpc-cidr-block" {
+    description = "vpc cidr block"
+}
+
+variable "env" {
+    description = "env to deploy"
+}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = var.cidr_blocks[0]
+    tags = {
+        Name = var.env
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = var.cidr_blocks[1]
+    availability_zone = "ap-south-1a"
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+
+output "dev-vpc-id" {
+    value = aws_vpc.dev_vpc.id
+}
+
+output "dev-sn-1-id" {
+    value = aws_subnet.dev-sn-1.id
+}
+
+## export the environment
+export AWS_ACCESS_KEY_ID = ""
+export AWS_SECRET_ACCESS_KEY = ""
+export AWS_DEFAULT_REGION= "ap-south-1"
+
+>> terraform apply
+
+### code ###
+### code ### 
+provider "aws" {
+}
+
+variable "cidr_blocks" {
+    type = list(string)
+}
+
+variable "sn-cidr-block" {
+    description = "subnet cidr block"
+    default = "10.0.6.0/24"
+    type = string
+}
+
+variable "vpc-cidr-block" {
+    description = "vpc cidr block"
+}
+
+variable "env" {
+    description = "env to deploy"
+    default = "Development"
+}
+
+variable az {}
+
+resource "aws_vpc" "dev_vpc" {
+    cidr_block = var.cidr_blocks[0]
+    tags = {
+        Name = var.env
+    }
+} 
+
+resource "aws_subnet" "dev-sn-1" {
+    vpc_id = aws_vpc.dev_vpc.id
+    cidr_block = var.cidr_blocks[1]
+    availability_zone = var.az
+    tags = {
+        Name = "dev-sn-01"
+    }
+} 
+
+data "aws_vpc" "default_vpc" {
+    default = true
+}
+
+
+output "dev-vpc-id" {
+    value = aws_vpc.dev_vpc.id
+}
+
+output "dev-sn-1-id" {
+    value = aws_subnet.dev-sn-1.id
+}
+
+>> export TF_VAR_az="ap-south-1a"
+>> terraform apply
+
+>> export TF_VAR_az="ap-south-1b"
+>> terraform apply
+
+----------------------------------------------------------
+                >>>> 31-terraform-project-01
+
+Requirements:- Terraform 
+----------------
+Vpc, subnet, Internet gateway,routing tables, security groups,  Ec2, nginx, docker container.
+
+### i creat one vpc and one subnet
+main.tf:-
+---------
+
+provider "aws" {
+    
+}
+
+variable vpc_cidr_block {}
+variable sn-cidr-block {}
+variable env {}
+variable az {}
+
+resource "aws_vpc" "tttapp_vpc" {
+    cidr_block = var.vpc_cidr_block
+    tags = {
+        Name = "$(var.env)-vpc"
+    }
+
+}
+
+resource "aws_subnet" "tttapp-sn-1" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = var.az
+    tags = {
+        Name = "$(var.env)-subnet-1"
+    }
+}
+
+terraform.tfvars:-
+-----------------
+vpc_cidr_block = "10.0.0.0/16"
+sn-cidr-block = "10.0.1.0/24"
+env = "dev"
+az = "ap-south-1a"
+
+>> terraform apply
+i created one vpc and one subnet
+
+### create route table and internet gateway
+main.tf:-
+---------
+provider "aws" {
+    
+}
+
+variable vpc_cidr_block {}
+variable sn-cidr-block {}
+variable env {}
+variable az {}
+
+resource "aws_vpc" "tttapp_vpc" {
+    cidr_block = var.vpc_cidr_block
+    tags = {
+        Name = "$(var.env)-vpc"
+    }
+
+}
+
+resource "aws_subnet" "tttapp-sn-1" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = var.az
+    tags = {
+        Name = "$(var.env)-subnet-1"
+    }
+}
+
+resource "aws_internet_gateway" "tttapp-igw" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+    tags = {
+        Name = "$(var.env)-igw"
+    }
+}
+
+resource "aws_route_table" "tttmain-rtb" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+
+    route {
+        cidr_block = "0.0.0.0/0"
+        gateway_id = aws_internet_gateway.tttapp-igw.id
+    }
+    tags = {
+        Name = "$(var.env)-rtb"
+    }
+}
+
+>> terraform apply
+
+
+### add the route table association 
+route table associate to subnet and access the internet gateway.
+
+main.tf:-
+---------
+provider "aws" {
+    
+}
+
+variable vpc_cidr_block {}
+variable sn-cidr-block {}
+variable env {}
+variable az {}
+
+resource "aws_vpc" "tttapp_vpc" {
+    cidr_block = var.vpc_cidr_block
+    tags = {
+        Name = "$(var.env)-vpc"
+    }
+
+}
+
+resource "aws_subnet" "tttapp-sn-1" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = var.az
+    tags = {
+        Name = "$(var.env)-subnet-1"
+    }
+}
+
+resource "aws_internet_gateway" "tttapp-igw" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+    tags = {
+        Name = "$(var.env)-igw"
+    }
+}
+
+resource "aws_route_table" "tttmain-rtb" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+
+    route {
+        cidr_block = "0.0.0.0/0"
+        gateway_id = aws_internet_gateway.tttapp-igw.id
+    }
+    tags = {
+        Name = "$(var.env)-rtb"
+    }
+}
+
+resource "aws_route_table_association" "a-rtb-subnet" {
+    subnet_id    = aws_subnet.tttapp-sn-1.id
+    route_table_id = aws_route_table.tttapp-rtb.id
+}
+
+>> terraform apply
+
+### create a security group 
+ssh = 22
+https = 8080
+
+main.tf:-
+---------
+provider "aws" {
+    
+}
+
+variable vpc_cidr_block {}
+variable sn-cidr-block {}
+variable env {}
+variable az {}
+
+resource "aws_vpc" "tttapp_vpc" {
+    cidr_block = var.vpc_cidr_block
+    tags = {
+        Name = "$(var.env)-vpc"
+    }
+
+}
+
+resource "aws_subnet" "tttapp-sn-1" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = var.az
+    tags = {
+        Name = "$(var.env)-subnet-1"
+    }
+}
+
+resource "aws_internet_gateway" "tttapp-igw" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+    tags = {
+        Name = "$(var.env)-igw"
+    }
+}
+
+resource "aws_route_table" "tttmain-rtb" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+
+    route {
+        cidr_block = "0.0.0.0/0"
+        gateway_id = aws_internet_gateway.tttapp-igw.id
+    }
+    tags = {
+        Name = "$(var.env)-rtb"
+    }
+}
+
+resource "aws_route_table_association" "a-rtb-subnet" {
+    subnet_id    = aws_subnet.tttapp-sn-1.id
+    route_table_id = aws_route_table.tttapp-rtb.id
+}
+
+resource "aws_security_group" "tttapp-sg" {
+  name = "tttapp-sg"
+  vpc_id = aws_vpc.tttapp_vpc.id 
+
+  ingress {
+    from_port  = 22
+    to_port    = 22
+    protocol   = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  } 
+
+  ingress {
+    from_port = 8080
+    to_port   = 8080
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port  = 0
+    to_port    = 0
+    protocol   = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    prefix_list_ids = []
+  }
+
+  tags = {
+    Name = "$(var.env)-sg"
+  }
+}
+
+>> terraform apply
+
+goto ec2-> security groups -> inbound rules and outbound rules->check the ssh and https and alltraffic
+
+### create Ec2 instance 
+
+main.tf:-
+---------
+provider "aws" {
+    
+}
+
+variable vpc_cidr_block {}
+variable sn-cidr-block {}
+variable env {}
+variable az {}
+
+resource "aws_vpc" "tttapp_vpc" {
+    cidr_block = var.vpc_cidr_block
+    tags = {
+        Name = "$(var.env)-vpc"
+    }
+
+}
+
+resource "aws_subnet" "tttapp-sn-1" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = var.az
+    tags = {
+        Name = "$(var.env)-subnet-1"
+    }
+}
+
+resource "aws_internet_gateway" "tttapp-igw" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+    tags = {
+        Name = "$(var.env)-igw"
+    }
+}
+
+resource "aws_route_table" "tttmain-rtb" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+
+    route {
+        cidr_block = "0.0.0.0/0"
+        gateway_id = aws_internet_gateway.tttapp-igw.id
+    }
+    tags = {
+        Name = "$(var.env)-rtb"
+    }
+}
+
+resource "aws_route_table_association" "a-rtb-subnet" {
+    subnet_id    = aws_subnet.tttapp-sn-1.id
+    route_table_id = aws_route_table.tttapp-rtb.id
+}
+
+>> terraform apply
+
+### create a security group 
+ssh = 22
+https = 8080
+
+main.tf:-
+---------
+provider "aws" {
+    
+}
+
+variable vpc_cidr_block {}
+variable sn-cidr-block {}
+variable env {}
+variable az {}
+
+resource "aws_vpc" "tttapp_vpc" {
+    cidr_block = var.vpc_cidr_block
+    tags = {
+        Name = "$(var.env)-vpc"
+    }
+
+}
+
+resource "aws_subnet" "tttapp-sn-1" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+    cidr_block = var.sn-cidr-block
+    availability_zone = var.az
+    tags = {
+        Name = "$(var.env)-subnet-1"
+    }
+}
+
+resource "aws_internet_gateway" "tttapp-igw" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+    tags = {
+        Name = "$(var.env)-igw"
+    }
+}
+
+resource "aws_route_table" "tttmain-rtb" {
+    vpc_id = aws_vpc.tttapp_vpc.id
+
+    route {
+        cidr_block = "0.0.0.0/0"
+        gateway_id = aws_internet_gateway.tttapp-igw.id
+    }
+    tags = {
+        Name = "$(var.env)-rtb"
+    }
+}
+
+resource "aws_route_table_association" "a-rtb-subnet" {
+    subnet_id    = aws_subnet.tttapp-sn-1.id
+    route_table_id = aws_route_table.tttapp-rtb.id
+}
+
+resource "aws_security_group" "tttapp-sg" {
+  name = "tttapp-sg"
+  vpc_id = aws_vpc.tttapp_vpc.id 
+
+  ingress {
+    from_port  = 22
+    to_port    = 22
+    protocol   = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  } 
+
+  ingress {
+    from_port = 8080
+    to_port   = 8080
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port  = 0
+    to_port    = 0
+    protocol   = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    prefix_list_ids = []
+  }
+
+  tags = {
+    Name = "$(var.env)-sg"
+  }
+}
+
+data "aws_ami" "amazon-linux-image" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  } 
+
+  filter {
+    name = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+output "ami_id" {
+    value = data.aws_ami.amazon-linux-image.id
+}
+
+>> terraform plan
+
+### main.tf
+
+resource "aws_instance" "tttapp-server" {
+  ami                         = data.aws_ami.amazon-linux-image.id
+  instance_type               = "t2.micro"
+  key_name                    = "terraform-server"
+  associate_public_ip_address = true
+  subnet_id                   = aws_subnet.tttapp-sn-1.id
+  vpc_security_group_ids      = [aws_security_group.tttapp-sg.id]
+  availability_zone           = var.az
+
+  tags = {
+    Name = "$(var.env)-server"
+  }  
+}
+
++++ created ec2 instance through internet gateway
+>> terraform apply
+
+### install docker and run the nginx server
+
+### main.tf
+
+resource "aws_instance" "tttapp-server" {
+  ami                         = data.aws_ami.amazon-linux-image.id
+  instance_type               = "t2.micro"
+  key_name                    = "terraform-server"
+  associate_public_ip_address = true
+  subnet_id                   = aws_subnet.tttapp-sn-1.id
+  vpc_security_group_ids      = [aws_security_group.tttapp-sg.id]
+  availability_zone           = var.az
+
+  tags = {
+    Name = "$(var.env)-server"
+  }  
+}
+
+user_data = <<EOF
+               #!/bin/bash
+               yum update && yum install -y docker
+               systemctl start docker
+               usermod -aG docker ec2-user
+               docker run -d 8080:8080 nginx &
+             EOF  
+}
+
+>> terraform apply
+
+----------------------------------------------------------
+        >>>> 32- terraform-end-to-end-part-03
+
+### main.tf
+>> terraform plan
+>> terraform apply
+
+## terraform providers
+## terraform modules
+
+## file structure of terraform
+++ main.tf
+++ variables.tf
+++ outputs.tf
+++ providers.tf
+
+------------------end------------------------------------
+
+-----------------------------------------------------------
+>>>> learning.trietreetech.com

@@ -1,0 +1,2362 @@
+Devops Project - 2022: CI/CD with Jenkins Ansible Kubernetes
+-------------------------------------------------------------
+
+#### Tools:-
+++ Git       -> Local version control system.
+++ Github    -> Distributed version control system.
+++ Jenkins   -> Continuous Integration Tool.
+++ Maven     -> Build tool.
+++ Ansible   -> Configuration Management and Deployment tool.
+++ Docker    -> Containerisation.
+++ K8S       -> Container Management tool.
+
+#### Simple Devops project
+
+
+       continuous build          continuous Delivery
+Github-----------------> Jenkins--------------------> Ansible
+                                                      |   |
+ ^                 |----------------------------------|   |
+ |                 |   Docker Image Push                  |De
+ | </>             |                                      |p 
+ | check-in        |                                      |o
+ |                 ^   Docker Image Pull                  ^y 
+Git            Docker-------------------------------->K8S  m
+                                                           ent
+
+
+#### Build and Deploy on Tomcat Server
+>>> Setup CI/CD with Github,Jenkins,Maven and Tomcat
+  ++ Setup Jenkins
+  ++ Setup & configure Mavne and Git
+  ++ Setup Tomcat Server
+  ++ Integrating Github,Maven, Tomcat Server with Jenkins
+  ++ Create a CI and CD job
+  ++ Test the deployment
+
+
+>>> Deploy Artifacts on a Tomcat Server
+
+   commit code   Pull code       Deploy code
+Git------->Github-------->Jenkins---------->Tomcat server
+                            |
+                            | Build code
+                            |
+                            ^
+                          Maven   
+
+
+>>> Deploy Artifacts on a Container
+>> Setup CI/CD  with GitHub, Jenkins,Maven and Docker
+  ++ Setting up Docker environment
+  ++ Write Dockerfile
+  ++ Create an image and container on docker host
+  ++ Integrate docker host with Jenkins
+  ++ Create CI/CD job on Jenkins to build and deploy on a container
+
+
+   commit code   Pull code       Deploy code
+Git------->Github-------->Jenkins----------> docker
+                            |
+                            | Build code
+                            |
+                            ^
+                          Maven   
+
+>> CI/CD with Github,Jenkins,Maven, Ansible and Docker
+   ++ Setup Ansible server
+   ++ Integrate Docker host with Ansible
+   ++ Ansible playbook to create image
+   ++ Ansible playbook to create container
+   ++ Integrate Ansible with Jenkins
+   ++ CI/CD job to build code on ansible and deploy it on docker container
+
+
+
+      Pull code       Copy Artifacts   Deploy container
+Github-------->Jenkins---------->Ansible--------> docker
+  ^                         |        \ push      pull /
+  |                         | Build   \ image  image /
+  |commit code              | code     \            / 
+  |                         ^           \          /
+ git                      Maven           Docker hub
+
+
+
+ >>> Deploy Artifacts on Kubernetes
+ >> CI/CD with Github, Jenkins, Maven, Ansible and Kubernets
+   ++ Setup Kubernetes (EKS)
+   ++ Write pod, service and deployment manifest files
+   ++ Integrate Kubernetes with Ansible
+   ++ Ansible playbooks to create deployment and service
+   ++ CI/CD job to build code on ansible and deploy it on Kubernetes
+
+ >> Deploy Artifacts on Kubernetes
+ 
+      Pull code       Copy Artifacts   Deploy container
+Github-------->Jenkins---------->Ansible--------> K8s
+  ^                         |        \ push      pull /
+  |                         | Build   \ image  image /
+  |commit code              | code     \            / 
+  |                         ^           \          /
+ git                      Maven           Docker hub
+
+
+
+#### What is CI and CD
+   >> Continuous Integration (CI)
+   >> Continuous Delivery (CD)
+   >> Continuous Deployment (CD)
+
+source: 
+-------
+>> https://aws.amazon.com/devops/continuous-integration/
+>> github.com/yankils
+
+
+#### Resouces to setup Devops CI/CD pipeline
+
+>> github.com/yankils
+
+
+#### Devops project source code
+
+>> github.com/yankils/hello-world
+
+>> github.com/yankils/Simple-DevOps-Project
+
+
+#### CI/CD pipeline using Git,Jenkins and Maven
+
+>>> Build code
+
+
+   commit code        pull code
+git----------->github--------------->Jenkins
+                                       |
+                                       |
+                                       | Build code
+                                       ^ 
+                                     Maven  
+
+
+
+>>> Setup Jenkins Server
+  
+  ++ Setup a Linux Ec2 instance
+  ++ Install Java
+  ++ Install Jenkins
+  ++ Start Jenkins
+  ++ Access Web UI on port 8080
+
+
+>>> Run your first jenkins job
+
+create newitem -> Helloworldjob -> Freestyle project -> ok 
+
+Build -> execute shell
+echo "Hello world"
+uptime
+apply and save
+
+>>> Integrate with Jenkins
+
+
+   commit code        pull code
+git----------->github--------------->Jenkins
+                                       |
+                                       |
+                                       | Build code
+                                       ^ 
+                                     Maven  
+
+>>> Integrate Github with Jenkins
+ ++ Install Git on Jenkins instance
+ ++ Install Github plugin on Jenkins GUI
+ ++ Configure Git on Jenkins GUI
+
+  Github
+    |
+    |
+    |
+    | git
+    ^
+  Jenkins  
+
+>>> Install git
+   >> yum install git
+   >> git --version
+
+>>> Install Jenkins plugin 
+
+goto jenkins dashboard -> manage jenkins -> manage plugins -> available -> github -> install
+
+
+goto jenkins dashboard -> manage jenkins -> Global Tool configuration -> Git
+apply and save
+
+>>> Run jenkins job to pull code from Github
+
+https://github.com/yankils/hello-world
+github.com/ravdy
+
+create newiem -> pullcodefromGithub -> Freestyle project -> 
+ok
+
+General -> pull code from Github
+source code management -> Git -> 
+https://github.com/yankils/hello-world.git
+
+apply and save
+Buildnow
+
+
+#### Integrate Maven with Jenkins
+
+       Jenkins
+         |
+         |
+         | build code
+         |
+         ^
+       Maven  
+
+  ++ Setup maven on Jenkins Server
+  ++ Setup Environment Variables
+    ++ JAVA_HOME, M2, M2_HOME
+  ++ Install Maven Plugin
+  ++ Configure Maven and Java
+
+  ++ download maven
+    ++ maven.apache.org/download.cgi
+
+>>> install the maven
+ >> cd /opt
+ >> wget <maven-download-link>
+ >> ll
+ >> tar -xvzf apache-maven-3.8.3-bin.tar.gz
+ >> mv apache-maven-3.8.3 maven
+ >> cd maven
+ >> cd bin
+ >> ./mvn -v
+
+>>> Setup the environment variables(Java and Maven)
+ >> cd ~
+ >> pwd
+ >> ll -a
+# first setup java
+>> find / -name jvm
+>> find / -name java-11*
+>> cd /usr/lib/jvm
+>> ll
+>> vi .bash_profile
+M2_HOME=/opt/maven
+M2=/opt/maven/bin
+JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.12.0.7-0.amzn2.0.2.x86_64
+
+PATH=$PATH:$HOME/bin:$JAVA_HOME:$M2_HOME:$M2
+
+>> source .bash_profile
+>> echo $PATH
+>> mvn -v
+
+>>> Install maven plugin
+
+goto jenkins dashboard -> manage jenkins -> manage plugins -> maven integration -> install
+
+goto jenkins dashboard -> manage jenkins -> Global tool configuration -> 
+
+JDK -> 
+Name -> java-11
+JAVA_HOME -> /usr/lib/jvm/java-11-openjdk-11.0.12.0.7-0.amzn2.0.2.x86_64
+
+Maven ->
+Name -> maven
+maven_home -> /opt/maven
+
+apply and save
+
+
+#### Build a java project using jenkins
+
+create newitem -> FirstMavenProject -> maven project -> 
+General -> FirstMavenProject
+source code management -> git -> 
+https://github.com/yankils/hello-world.git
+Build -> Goals and options ->
+clean install package
+
+apply and save
+
+Buildnow
+
+#### Integrating Tomcat server in CI/CD pipeline
+>>> Deploy Artifacts on a Tomcat Server
+
+
+
+
+  commit code     pull code       Deploy code
+git--------->github------->Jenkins---------->Tomcat Server
+                            |
+                            |
+                            |Build code
+                            |
+                            ^
+                          maven
+
+
+>>> Setup Tomcat Server
+  ++ Setup a Linux Ec2 Instance
+  ++ Install Java
+  ++ Configure Tomcat
+  ++ Start Tomcat Server
+  ++ Access Web UI on port 8080
+
+
+>> github.com/yankils/Simple-DevOps-Project/blob/master/Tomcat/tomcat_installation.MD
+
+>> goto tomcat download 
+Binary Distributions
+    >> core
+      ++ tar.gz
+
+
+Create Ec2 instance for tomcat server
+
+>> sudo su -     (# become a root user)
+>> install java
+>> check the java --version
+
+Install tomcat server
+>> cd /opt
+>> wget <tomcat-download-link>
+>> ll
+>> tar -xvzf apache-tomcat-9.0.54.tar.gz
+>> ll
+>> mv apache-tomcat-9.0.54 tomcat
+>> ll
+>> cd tomcat
+>> ll
+>> cd bin
+>> ll
+>> ./startup.sh
+
+
+goto browser <tomcat-server:8080>
+
+>> cd ..
+>> pwd
+>> ll
+>> find / -name context.xml
+>> vi /opt/tomcat/webapps/host-manager/META-INF/context.xml
+<!-- <Value className>
+    allow= sakjjas /> -->
+
+>> vi /opt/tomcat/webapps/manager/META-INF/context.xml
+<!-- <Value className>
+    allow=kjfkjfkjkjdskj /> -->
+
+>> ll
+>> cd bin
+>> ./shutdown.sh
+>> ./startup.sh
+>> cd ..
+>> ll
+>> cd conf
+>> ll
+>> vi tomcat-users.xml
+<role rolename="manager-gui"/>
+<role rolename="manager-script"/>
+<role rolename="manager-jmx"/>
+<role rolename="manager-status"/>
+<user username="admin" password="admin" roles="manager-gui, manager-script, manager-jmx, manager-status"/>
+<user username="deployer" password="deployer" roles="manager-script"/>
+<user username="tomcat" password="s3cret" roles="manager-gui"/>
+
+>> ln -s /opt/tomcat/bin/startup.sh /usr/local/bin/tomcatup
+>> ln -s /opt/tomcat/bin/shutdown.sh /usr/local/bin/tomcatdown
+
+>> tomcatdown
+>> tomcatup
+
+
+#### Integrate Tomcat with Jenkins
+  
+  ++ install "Deploy to container"
+  ++ Configure tomcat server with Credentials
+
+        Deploy Code
+Jenkins---------------> Tomcat server
+
+
+goto jenkins dashboard -> manage jenkins -> Deploy to container -> Install
+
+goto jenkins dashboard -> manage credentials -> jenkins -> Global credentials -> Add credentials -> 
+kind -> Username with password
+scope -> Global(jenkins,nodes,items etc)
+Username -> deployer
+password -> deployer
+ID -> tomcat_deployer
+Description -> tomcat_deployer
+ok
+
+
+create newitem -> BuildandDeployJob -> Maven project -> ok
+
+General -> Build code with help of maven and deploy it on Tomcat server
+
+Source code management -> Git -> 
+https://github.com/yankils/hello-world.git
+
+Build -> 
+Root POM -> pom.xml
+Goals and options -> clean install
+
+Post-build Actions -> Deploy war/ear to a container
+
+war/ear files -> **/*.war
+
+containers ->
+
+credentials -> add tomcat credentials
+Tomcaturl -> <tomcat-server-ip:8080>
+
+apply and save
+
+Buildnow
+
+goto browser -> <tomcat-server-ip>:8080/webapp/
+
+
+#### Deploy Artifacts on a Tomcat Server
+
+
+   commit code     pull code       Deploy code
+git--------->github--------->Jenkins---------->Tomcat-server
+                               |
+                               |
+                               |Build code
+                               |
+                               ^
+                             maven
+
+
+>> open git and clone the project
+update the index.jsp file
+>> form filling html code
+ <form action="action_page.php">
+  <div class="container">
+    <h1>Register</h1>
+    <p>Please fill in this form to create an account.</p>
+    <hr>
+
+    <label for="email"><b>Email</b></label>
+    <input type="text" placeholder="Enter Email" name="email" id="email" required>
+
+    <label for="psw"><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+
+    <label for="psw-repeat"><b>Repeat Password</b></label>
+    <input type="password" placeholder="Repeat Password" name="psw-repeat" id="psw-repeat" required>
+    <hr>
+
+    <p>By creating an account you agree to our <a href="#">Terms & Privacy</a>.</p>
+    <button type="submit" class="registerbtn">Register</button>
+  </div>
+
+  <div class="container signin">
+    <p>Already have an account? <a href="#">Sign in</a>.</p>
+  </div>
+</form> 
+
+>> git status
+>> git add .
+>> git commit -m "updated index.jsp file"
+>> git push origin master
+
+goto github -> settings -> Developer settings -> Personal access tokens -> Generate a new token -> devopsproject_token
+-> 
+
+
+goto jenkins dashboard -> BuildandDeployJob -> Buildnow
+
+
+#### Automate build and deploy using Poll SCM
+
+>>> Deploy Artifacts on a Tomcat Server
+
+
+
+
+   commit code     pull code       Deploy code
+git--------->github--------->Jenkins---------->Tomcat-server
+                               |
+                               |
+                               |Build code
+                               |
+                               ^
+                             maven
+
+
+goto jenkins dashboard -> goto project -> BuildandDeployJob -> Build Triggers -> Poll SCM -> * * * * * 
+apply and save
+Buildnow
+
+
+#### Integrating Docker in CI/CD Pipeline
+
+>>>> Setup Docker environment
+
+>>> Deploy on a container
+
+
+
+   commit code     pull code       Deploy code
+git--------->github--------->Jenkins---------->docker
+                               |
+                               |
+                               |Build code
+                               |
+                               ^
+                             maven
+
+
+>>> Setup docker host
+  ++ Setup a Linux EC2 Instance
+  ++ Install docker
+  ++ Start docker services
+  ++ Basic docker commands
+
+  github.com/yankils/Simple-Devops-Project
+
+  docker installation
+
+  goto ec2 instance and launch instance for docker
+
+>> sudo su -
+>> yum install docker -y
+>> service docker status
+>> service docker start
+>> docker images
+>> docker ps
+>> docker ps -a
+
+#### Create a tomcat container
+
+>>> How to create docker container
+
+
+        docker pull           docker run
+Docker hub ----> Docker Image -----------> Docker container
+                   ^
+                   |
+                   |
+docker file--------| 
+           docker build
+
+>> hub.docker.com
+
+goto docker ec2 instance
+>> change the hostname
+>> vi /etc/hostname
+dockerhost
+>> init 6  (reboot the system)
+>> sudo su -
+>> first run docker service
+>> service docker status
+         or
+>> systemctl status docker
+
+>> service docker start
+         or
+>> systemctl start docker
+
+>> docker pull tomcat
+>> docker images
+
+# Run the containers
+>> docker images
+>> docker ps -a
+>> docker run -d --name tomcat-container -p 8081:8080 tomcat
+>> docker ps -a
+
+goto browser <tomcatserver-ip>:8081
+
+
+#### Fixng tomcat container issue:-
+>> HTTP Status 404 - Not Found tomcat container error
+
+tomcat give error 404 -Docker Forums
+
+>> docker ps
+>> docker exec -it tomcat-container /bin/bash
+>> ls
+>> cd webapps
+>> ls
+>> cd ..
+>> pwd
+>> ls
+>> cd webapps.dist
+>> ls
+these all directories copy into webapps directory
+>> cp -R * ../webapps/
+>> cd ../webapps
+>> ls
+>> exit
+>> docker ps -a
+>> docker stop tomcat-container
+>> docker ps -a
+>> docker ps
+only running containers
+>> docker run -d --name tomcat2 -p 8082:8080 tomcat:latest
+>> docker ps
+>> 
+goto browser <tomcat-server-ip>:8082
+
+
+>>> How to create docker container
+
+   Docker hub
+    |
+    |docker pull
+    |
+    ^
+  Dockerfile------->Docker image--------->Docker container  
+           docker build         docker run         
+
+
+#### Create a first docker file
+
+>>> How to create docker container
+
+   Docker hub
+    |
+    |docker pull
+    |
+    ^
+  Dockerfile------->Docker image--------->Docker container  
+           docker build         docker run         
+
+
+#### Create a first Docker file
+
+>>> How to create docker container
+
+   Docker hub
+    |
+    |docker pull
+    |
+    ^
+  Dockerfile------->Docker image--------->Docker container  
+           docker build         docker run         
+
+
+>> write your first docker file
+  ++ FROM: To pull the base image
+  ++ RUN : To execute commands
+  ++ CMD : To provide defaults for an executing container
+  ++ ENTRYPOINT : To configure a container that will run as 
+                 an executable
+  ++ WORKDIR: To sets the working directory
+  ++ COPY : To copy a directory from your local machine 
+            to the docker container
+  ++ ADD : To copy files and floders from your local machine
+           to docker containers
+  ++ EXPOSE : Informs Docker that the container listens on the specified network ports at runtime
+  ++ ENV : To set environment variables
+
+
+reference: 
+>> docs.docker.com/engine/reference/builder
+>> github.com/yankils/Simple-DevOps-Project/blob/master/Docker/Dockerfile_Instructions.md
+
+
+>> Install tomcat on centos (Dockerfile)
+  ++ Pull centos form dockerhub               - FROM
+  ++ Install java                             - RUN
+  ++ Create /opt/tomcat directory             - RUN
+  ++ Change work directory to /opt/tomcat     - WORKDIR
+  ++ Download tomcat packages                 - ADD /RUN
+  ++ Extract tar.gz file                      - RUN
+  ++ Rename to tomcat directory               - RUN
+  ++ Tell to docker that it runs on port 8080 - EXPOSE
+  ++ Start tomcat services                    - CMD
+
+>>> goto ec2 docker instance
+>> create a dockerfile
+>> vi Dockerfile
+FROM centos:latest
+RUN yum install java -y
+RUN mkdir /opt/tomcat
+WORDIR /opt/tomcat
+ADD <tomcat-download-link>.tar.gz .
+RUN tar -xvzf apache-tomcat-9.0.54.tar.gz
+RUN mv apache-tomcat-9.0.54/* /opt/tomcat
+EXPOSE 8080
+CMD ["/opt/tomcat/bin/catalina.sh", "run"]
+
+
+note :- dot means current directory
+>> docker build -t mytomcat .
+note: build the image
+>> docker images
+note: view the docker image
+>> docker run -d --name mytomcat-server -p 8083:8080 mytomcat
+note: run the container
+>> docker ps -a
+note: all containers list
+>> docker stop mytomcat-server
+note: stop the container
+
+
+#### create a customized Dockerfile for Tomcat
+
+reference : github.com/yankils/Simple-DevOps-Project/Docker/apache-tomcat_dockerfile.txt
+
+>> vi Dockerfile
+FROM tomcat:latest
+RUN cp -R /usr/local/tomcat/webapps.dist/* /usr/local/tomcat/webapps
+
+>>build the dockerfile
+>> docker build -t demotomcat .
+>> docker images
+>> docker ps -a
+>> docker run -d --name demotomcat-container -p 8085:8080 demotomcat
+>> docker ps -a
+
+goto browser <docker-host-ip>:8085
+
+
+#### Integrate Docker with Jenkins
+   ++ Create a dockeradmin user
+   ++ Install "Publish Over SSH" plugin
+   ++ Add Dockerhost to Jenkins "configure systems"
+
+## login to dockerhost
+
+>> cat /etc/passwd  (#check the users)
+>> cat /etc/group   (#check the group)
+
+## create a user
+>> useradd dockeradmin
+>> passwd dockeradmin
+>> id dockeradminuser
+
+## user add to docker group
+>> usermod -aG docker dockeradmin
+
+## passwordless authentication
+  >> vi /etc/ssh/sshd_config
+     PasswordAuthentication yes
+     #PasswordAuthentication no
+
+## Restart the service
+  >> service sshd reload
+
+## Integrate jenkins to docker
+>> goto jenkins dashboard -> manage jenkins -> manage plugins -> Publish Over SSH -> install
+
+>> goto jenkins dashboard -> manage jenkins -> configure system -> Publish over ssh -> ssh servers -> 
+Name -> dockerhost
+hostname -> <privateip of docker-server>
+username -> dockeradmin
+password -> yourpassword
+testconnection
+apply and save
+
+#### Jenkins job to build and copy artifacts on to docker host
+
+>> Deploy on a container
+
+
+   commit code     pull code       Deploy code
+git--------->github--------->Jenkins---------->docker
+                               |
+                               |
+                               |Build code
+                               |
+                               ^
+                             maven
+
+
+
+>> goto ec2 jenkins server
+>> goto jenkins dashboard -> 
+create newitem -> BuildAndDeployOnContainer
+
+copy from -> BuildAndDeployJob
+ok
+
+General -> Build code with help of maven and deploy it on docker
+
+Post-build Actions -> 
+send build artifacts over SSH 
+Name -> dockerhost
+Source files -> webapp/target/*.war
+Remove prefix -> webapp/target
+apply and save
+
+Buildnow
+
+#### Update tomcat dockerfile to automate deployment process
+
+goto docker ec2 instance
+>> cd /opt
+>> ll
+>> mkdir docker
+>> ll
+>> chown -R dockeradmin:dockeradmin docker
+>> ls -ld
+>> cd ..
+>> cd /root
+>> ll
+>> mv Dockerfile /opt/docker/
+>> cd /opt/docker/
+>> ll -l
+>> chown -R dockeradmin:dockeradmin /opt/docker
+>> ll
+
+
+goto jenkins dashboard
+
+Post-build Actions -> 
+send build artifacts over SSH 
+Name -> dockerhost
+Source files -> webapp/target/*.war
+Remove prefix -> webapp/target
+Remote directory -> //opt//docker
+apply and save
+
+Buildnow
+
+
+goto ec2 docker instance
+
+>> cd /opt/docker/
+>> ll
+>> vi Dockerfile 
+FROM tomcat:latest
+RUN cp -R /usr/local/tomcat/webapps.dist/* /usr/local/tomcat/webapps
+COPY ./*.war /usr/local/tomcat/webapps
+
+>> docker build -t tomcat:v1 .
+>> docker images
+>> docker run -d --name tomcatv1 -p 8086:8080 tomcat:v1
+
+goto browser <dockerhostip>:8086/webapp
+
+
+#### Automate build and deployment on Docker container
+
+goto jenkins dashboard -> BuildandDeployonContainer -> configure -> post-build actions -> 
+Exec command -> 
+cd /opt/docker;
+docker build -t regapp:v1 .;
+docker run -d --name registerapp -p 8087:8080 regapp:v1
+
+apply and save
+
+goto docker host
+>> docker images
+>> docker ps -a
+>> docker stop <container-id>
+note: all the running containers are stop
+>> docker ps -a
+>> docker container prune
+note: delete all the containers
+>> docker ps -a
+>> docker image prune -a
+note: delete all images
+>> docker images
+>> docker ps -a
+
+Build now
+
+>> cd /opt
+>> cd docker
+>> ll
+>> docker images
+>> docker ps -a
+
+goto browser <docker-host-ip>:8087/webapp/
+
+goto gitbash
+clone the helloworld program
+>> cd hello-world
+>> ll
+>> cd webapp/
+>> cd webapp/src/main/webapp/
+>> ll
+>> vi index.jsp
+<h1>New user Register</h1>
+>> git status
+>> git add .
+>> git commit -m "updated index.jsp file"
+>> git push origin master
+
+automatically trigger the jenkins job
+
+goto docker host run the commands
+>> docker build -t regapp:v1 .;
+>> docker run -d --name registerapp -p 8087:8080 regapp:v1
+>>
+
+
+#### Jenkins job to automate CI/CD to deploy application on
+docker container
+
+goto jenkins dashboard -> BuildandDeployoncontainer -> configure -> post build actions
+
+Exec command
+------------
+cd /opt/docker;
+docker build -t regapp:v1 .;
+docker stop registerapp;
+docker rm registerapp;
+docker run -d --name registerapp -p 8087:8080 regapp:v1
+
+apply and save
+
+Buildnow
+
+goto ec2 dockerhost
+>> cd /opt/
+>> cd docker
+>> ll
+>> docker images
+>> docker ps -a
+
+goto browser <dockerip>:8087/webapp/
+
+goto gitbash
+>> vi index.jsp
+<label for="Name"><b><Name></b></label>
+<input type="text" placeholder="Enter Name" name="Name" id="Name" required>
+<br>
+
+>> git commit -am "updated index.jsp"
+>> git push origin master
+
+goto dockerhost
+>> docker ps -a
+>> 
+
+goto browser <docker-host-ip>:8087/webapp/
+
+#### Integrating Ansible in CI/CD pipeline
+
+### Why do we need ansible
+
+>>> Using Ansible to create containers
+
+
+
+
+
+
+   commit code     pull code       Deploy container
+git--------->github--------->Jenkins---------->docker
+                               |
+                               |
+                               |Build code
+                               |
+                               ^
+                             maven
+
+
+                                        
+                        pushimage /--->dockerhub---|
+                                 /                 |pull
+                                |                  |image
+    pull code    copy artifacts |Deploy container  |
+github----->Jenkins------->Ansible------->docker<--| 
+                |
+                |
+                |Build code
+                |
+                ^
+              maven
+               
+ 
+
+### Ansible Installation 
+
+>>> Prepare Ansible Server
+  ++ Setup EC2 instance
+  ++ Setup hostname
+  ++ Create ansadmin user
+  ++ Add user to sudoers file
+  ++ Generate ssh keys
+  ++ Enable password based login
+  ++ Install ansible
+
+
+goto ec2 dashboard create a new instance for ansible
+
+>> sudo su -
+>> vi /etc/hostname
+ansible-server
+note: change the hostname
+>> init 6
+note: reboot the system
+>> sudo su -
+>> useradd ansadmin
+>> passwd ansadmin
+>> visudo
+ansadmin ALL=(ALL)  NOPASSWD: ALL
+>> vi /etc/ssh/sshd_config
+PasswordAuthentication yes
+#PasswordAuthentication no
+>> service sshd reload
+>> sudo su - ansadmin
+>> ssh-keygen
+>> sudo su -
+>> yum install ansible
+>> python --version
+>> ansible --version
+
+
+### Integrate Docker with Ansible
+
+>>> Manage DockerHost with Ansible
+
+
+Ansible-------------->Docker
+
+ ++ on docker Host
+    ++ Create ansadmin
+    ++ Add ansadmin to sudoers files
+    ++ Enable password based login
+
+ ++ on Ansible Node
+    ++ Add to hosts file
+    ++ copy ssh keys
+    ++ Test the connection
+
+goto ec2 dockerhost
+>> sudo su -
+>> useradd ansadmin
+>> passwd ansadmin
+>> visudo
+ansadmin   ALL=(ALL)     NOPASSWD: ALL
+>> grep Password /etc/ssh/sshd_config
+>> ifconfig
+
+
+goto ec2 ansible server
+>> vi /etc/ansible/hosts
+dockerhostip
+>> sudo su - ansadmin
+>> ll -la
+>> ssh-copy-id <dockerhostip>
+>>
+
+
+goto ec2 dockerhost
+>> sudo su - ansadmin
+>> ll
+>> ll -la
+>> cd .ssh
+>> ll
+>> cat authorized_keys
+
+goto ec2 ansible-server
+>> cat .ssh/id_rsa.pub
+>> cd ..
+>> ansible all -m ping
+>> ansible all -m command -a uptime
+
+goto ec2 dockerhost
+>> cd ..
+>> uptime
+
+
+### Integrate Ansible with Jenkins
+
+
+Jenkins------------> Ansible
+
+goto jenkins dashboard -> manage jenkins -> configure system -> publish over ssh -> SSH server
+Name -> ansible-server
+hostname -> <ansibleprivateipof system>
+username -> ansadmin
+password -> urpasswd
+testconnection
+
+apply and save
+
+goto jenkins dashboard 
+create newitem -> Copy_Artifacts_onto_Ansible -> 
+copy from -> BuildAndDeployOnContainer -> ok
+
+disable pollscm
+
+post-build actions ->
+ssh sever -> Name -> Ansible-server
+Remote directory -> //opt//docker
+
+apply and save
+
+goto ec2 ansible server
+>> cd /opt
+>> ll
+>> sudo mkdir docker
+>> ll
+>> sudo chown ansadmin:ansadmin docker
+>> ll
+>>  
+
+Buildnow
+
+goto ec2 ansible server
+>> cd /opt
+>> ll
+>> cd docker
+>> ll
+
+
+### Build an image and create container on Ansible
+
+goto ansible ec2 server
+
+>> sudo su - ansadmin
+>> cd /opt/
+>> cd docker
+>> cat /etc/group
+>> sudo yum install docker -y
+>> cat /etc/group
+>> sudo usermod -aG docker ansadmin
+>> id ansadmin
+>> service docker status
+>> sudo service docker start
+>> service docker status
+>> 
+
+goto ec2 docker host
+
+>> sudo su -
+>> cd /opt/docker/
+>> ll
+>> copy the dockerfile
+
+
+goto ec2 ansible server
+>> sudo su - ansadmin
+>> vi Dockerfile
+FROM tomcat:latest
+RUN cp -R /usr/local/tomcat/webapps.dist/*  /usr/local/tomcat/webapps
+COPY ./*.war /usr/local/tomcat/webapps
+
+>> docker build -t reg:app:v1 .
+>> sudo chmod 777 /var/run/docker.sock
+>> docker build -t reg:app:v1 .
+>> docker images
+>> docker run -t --name regapp-server -p 8081:8080 regapp:v1
+>> 
+
+goto browser <ansible-server-ip>:8081/webapp
+
+
+#### Ansible playbook to create image and container
+
+>>> Using Ansible to create containers
+
+
+                                        
+                        pushimage /--->dockerhub---|
+                                 /                 |pull
+                                |                  |image
+    pull code    copy artifacts |Deploy container  |
+github----->Jenkins------->Ansible------->docker<--| 
+                |
+                |
+                |Build code
+                |
+                ^
+              maven
+
+
+
+goto ec2 ansible-server
+
+>> sudo su - ansadmin
+>> cd /opt/
+>> ll
+>> cd docker
+>> ll
+>> cat /etc/ansible/hosts
+this is docker-host ip
+>> ifconfig
+take the private ip of ansible system
+eth0: 172.31.30.109 (#example ip)
+copy this ip into /etc/ansible/hosts paste into here 
+>> sudo vi /etc/ansible/hosts
+[dockerhost]
+172.31.21.252
+
+[ansible]
+172.31.30.109
+
+>> cat /etc/ansible/hosts
+>> ansible all -a uptime
+note: all hosts working or not
+>> ifconfig
+eth0: 172.31.30.109 (#example ip)
+>> ssh-copy-id 172.31.30.109
+>> ssh-copy-id localhost (# just practice)
+>> ansible all -a uptime
+>> pwd
+/opt/docker
+
+write ansible playbook
+>> vi regapp.yaml
+---
+- hosts: ansible
+
+  tasks:
+  - name: create docker image
+    command: docker build -t regapp:latest .
+    args:
+     chdir: /opt/docker
+
+>> ansible-playbook regapp.yml --check
+>> docker images
+>> ansible-playbook regapp.yml
+>> docker images
+
+
+#### Copy image on to dockerhub
+
+create docker hub account
+
+
+>> goto ec2 ansible server
+>> sudo su - ansadmin
+>> cd /opt/
+>> cd docker
+>> docker images
+>> docker login
+>> docker push regapp:latest
+note: can't directly into dockerhub
+>> docker tag <regapp-imageid> jackame/regapp:latest
+>> docker images
+>> docker push jackame/regapp:latest
+note:image has committed or not
+
+
+#### Jenkins job to build an image onto ansible
+
+>>> Using Ansible to create containers
+
+                                        
+                        pushimage /--->dockerhub---|
+                                 /                 |pull
+                                |                  |image
+    pull code    copy artifacts |Deploy container  |
+github----->Jenkins------->Ansible------->docker<--| 
+                |
+                |
+                |Build code
+                |
+                ^
+              maven
+
+goto ec2 ansible server
+>> sudo su - ansadmin
+>> cd /opt/
+>> cd docker
+>> ll
+>> vi regapp.yml
+---
+- hosts: ansible
+
+  tasks:
+  - name: create docker image
+    command: docker build -t regapp:latest .
+    args:
+     chdir: /opt/docker
+  - name: create tag to push image onto dockerhub
+    command: docker tag regapp:latest jackame/regapp:latest
+
+  - name: push docker image
+    command: docker push jackame/regapp:latest
+
+>> ansible-playbook regapp.yml --check
+>> ansible-playbook regapp.yml --limit ansible
+>> docker images
+
+if any changes in playbook automatically trigger the job in jenkins
+
+goto jenkins dashboard -> CopyartifactsontoAnsible ->
+configure -> post-build-actions ->
+Exec command -> ansible-playbook /opt/docker/regapp.yml
+apply and save
+
+enable poll scm -> * * * * *
+
+apply and save
+
+
+goto gitbash
+>> clone the hello-world project
+
+>> ll
+>> cd webapp/
+>> cd webapp/src/main/webapp/
+>> ll
+>> vi index.jsp
+edit any fields
+>> git add .
+>> git commit -m "bugfix for name entry"
+>> git push origin master
+>> 
+
+goto ansible ec2 server
+>> sudo su - ansadmin
+>> cd /opt/
+>> cd docker
+>> ll 
+>> docker images
+>>  
+
+goto gitbash
+>> vi index.jsp
+enter your name field
+>> git add .
+>> git commit -m "bugfix for name entry"
+>> git push origin master
+
+
+goto jenkins dashboard
+
+check the job is trigger or not
+
+#### How to create container on dockerhost using ansible playbook
+
+>>> using ansible to create containers
+
+                                        
+                        pushimage /--->dockerhub---|
+                                 /                 |pull
+                                |                  |image
+    pull code    copy artifacts |Deploy container  |
+github----->Jenkins------->Ansible------->docker<--| 
+                |
+                |
+                |Build code
+                |
+                ^
+              maven
+
+
+goto ec2 ansible server
+
+>> cd /opt/
+>> cd docker
+>> ll
+>> vi deploy_regapp.yml
+---
+- hosts: dockerhost
+
+  tasks:
+  - name: create container
+    command: docker run -d --name regapp-server -p 8082:8080 jackame/regapp:latest
+
+>> ansible-playbook deploy_regapp.yml --check
+
+goto ec2 docker host
+>> sudo su -
+>> service docker start
+>> docker images
+>> docker ps -a
+>> docker rm -f <container-id>
+note: remove the container    
+>> docker image prune
+note: delete the all images
+>> docker ps -a
+>> docker images
+>> docker rmi regapp:v1 tomcat
+>> docker images
+
+
+goto ansible ec2 server
+>> sudo su - ansadmin
+>> ansible-playbook deploy_regapp.yml
+>> 
+
+goto ec2 docker host
+>> sudo su - (rootuser)
+>> chmod 777 /var/run/docker.sock
+
+
+goto ansible ec2 server
+>> sudo su - ansadmin
+>> ansible-playbook deploy_regapp.yml
+>> 
+
+goto ec2 docker host
+>> sudo su - (rootuser)
+>> docker images
+>> docker ps -a
+
+goto browser <dockerhostip>:8082/webapp
+
+
+goto ansible ec2 server
+>> sudo su - ansadmin
+>> ansible-playbook deploy_regapp.yml
+note: again run the container raise an issue.
+you have to remove that container to be able to reuse that name.
+
+
+#### continuous deployment of docker container using ansible playbook
+
+>>> Deploy Ansible playbook
+
+
+Ansible-------------->Docker
+
+    ++ Remove existing container
+    ++ Remove existing image
+    ++ Create new container
+
+goto ansible ec2 server
+>> sudo su - ansadmin
+>> cd /opt/
+>> cd docker
+>> ll
+>> vi deploy_regapp.yml
+---
+- hosts: dockerhost
+
+  tasks:
+  - name: stop existing container
+    command: docker stop regapp-server
+
+  - name: remove the container
+    command: docker rm regapp-server
+
+  - name: remove image
+    command: jackame/regapp:latest
+
+  - name: create container
+    command: docker run -d --name regapp-server -p 8082:8080 jackame/regapp:latest
+
+ >> ansible-playbook deploy_regapp.yml --check
+ 
+
+goto ec2 dockerhost
+
+>> docker ps -a
+>> docker images
+>>
+
+
+goto ec2 ansible-server
+
+>> sudo su - ansadmin
+>> ansible-playbook deploy_regapp.yml
+
+ >> vi deploy_regapp.yml
+---
+- hosts: dockerhost
+
+  tasks:
+  - name: stop existing container
+    command: docker stop regapp-server
+
+  - name: remove the container
+    command: docker rm regapp-server
+
+  - name: remove image
+    command: jackame/regapp:latest
+
+  - name: create container
+    command: docker run -d --name regapp-server -p 8082:8080 jackame/regapp:latest
+
+>> ansible-playbook deploy_regapp.yml
+
+>> vi deploy_regapp.yml
+---
+- hosts: dockerhost
+
+  tasks:
+  - name: stop existing container
+    command: docker stop regapp-server
+    ignore_errors: yes
+
+  - name: remove the container
+    command: docker rm regapp-server
+    ignore_errors: yes
+
+  - name: remove image
+    command: docker rmi jackame/regapp:latest
+    ignore_errors: yes
+
+  - name: create container
+    command: docker run -d --name regapp-server -p 8082:8080 jackame/regapp:latest
+
+>> ansible-playbook deploy_regapp.yml
+
+
+goto ec2 dockerhost
+
+>> sudo su - (root)
+>> docker images
+>> docker ps -a
+
+
+
+goto browser
+
+docker_image module for ansible
+ref: docs.ansible.com/ansible/2.4/docker_image_module.html
+
+
+#### Jenkins CI/CD to deploy on container using ansible
+
+>>> using ansible to create containers
+                                        
+                        pushimage /--->dockerhub---|
+                                 /                 |pull
+                                |                  |image
+    pull code    copy artifacts |Deploy container  |
+github----->Jenkins------->Ansible------->docker<--| 
+                |
+                |
+                |Build code
+                |
+                ^
+              maven
+
+
+goto jenkins dashboard
+
+update my jenkins job
+
+goto copyartifactsontoansible project -> configure -> 
+post-build-actions -> Exec command
+
+ansible-playbook /opt/docker/regapp.yml;
+sleep 10;
+ansible-playbook /opt/docker/deploy_regapp.yml
+
+apply and save
+
+
+goto gitbash and edit the code
+
+>> vi index.jsp
+
+Enter your email
+
+>> git commit -am "bug fix for email"
+>> git push origin master
+>> 
+
+goto ec2 dockerhost
+>> sudo su -
+>> docker images
+>> docker ps -a
+>> 
+
+goto browser <dockerhostip>:8082/webapp
+
+goto ec2 ansible server
+>> sudo su - ansadmin
+>> cd /opt/
+>> cd docker
+>> docker images
+
+
+goto ec2 dockerhost
+>> sudo su -
+>> docker images
+>> docker ps -a
+>> 
+
+disable the poll scm 
+apply and save
+
+
+#### Kubernetes on AWS
+
+>>> why kubernetes
+
+
+
+
+
+                        pushimage /--->dockerhub---|
+                                 /                 |pull
+                                |                  |image
+    pull code    copy artifacts |Deploy container  |
+github----->Jenkins------->Ansible------->k8s<-----| 
+                |
+                |
+                |Build code
+                |
+                ^
+              maven
+
+
+note: 
+++ we could deploy application on docker container successfully.
+++ however ,in case this docker container goes down, there is no way to recover. 
+++ so to overcome this problem,we can use Docker native service called Docker swarm or we can use container management service like kubernetes.
+++ but using kubernetes use a lot of advantages compared to docker swarm.
+++ we are not going to deploy our applications has a docker container
+++ we are going to deploy it as a part on our kubernetes environment.
+++ we can deploy it as a pod environment.
+
+
+#### Kubernetes installation methods
+
+>>> kubernetes setup
+
+goto production environment
+
+
+
+#### Eks installation procedure
+
+goto ec2 services -> search eks -> add cluster -> create ->
+
+note: eks service is create difficult task.
+
+so we have move yo eksctl
+
+>>> setup kubernetes on Amazon EKS
+
+Reference:-
+github.com/yankils/Simple-Devops-Project/blob/master/Kubernetes/Kubernetes_setup_using_eksctl.md
+
+
+#### setup bootstrap server for eksctl
+
+create a new  ec2 instance free tiar for Eks_Bootstrap_server
+
+
+>> sudo su -
+>> aws --version
+
+>>> install the aws cli
+
+ref:- docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+>> aws --version
+>> sudo su -
+>> aws --version
+latest version has been updated
+
+
+>>> install the kubectl
+
+>> curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.21.2/2021-07-05/bin/linux/amd64/kubectl
+
+>> ll
+>> chmod +x kubectl
+>> mv kubectl /usr/local/bin
+>> echo $PATH
+>> kubectl version
+
+>> install eksctl
+
+after installation
+>> cd /tmp
+>> ll
+>> mv eksctl /usr/local/bin
+>> eksctl version
+
+
+goto ec2 dashboard-> search IAM -> select roles -> create role -> attach to ec2 -> ec2 full access and cloudformation fullaccess -> iam full access and administrative full access ->
+
+Rolename -> eksctl_role
+
+create role
+
+goto ec2 dashboard -> goto instances -> EKS_Bootstrap_server -> goto actions -> security -> modify Iam role -> eksctl_role -> save
+
+
+#### setup kubernetes using eksctl
+
+>>> create your cluster and nodes
+
+
+>> eksctl create cluster --name devmax \
+  -- region ap-south-1 \
+  -- node-type t2.small 
+
+
+goto aws dashboard -> search cloudformation -> created cluster
+
+
+>> cat /root/.kube/config
+
+>> goto ec2 dashboard -> check the t2.small instances created or not.  
+
+
+>> kubectl get nodes
+>> kubectl get all
+>> kubectl run webapp --image=httpd
+note: create a webapp pod created
+>> kubectl get all
+>> kubectl get po
+
+
+#### Run kubernetes basic commands
+
+github.com/yankils/Simple-DevOps-Project/blob/master/Kubernetes/kubernetes_setup_using_eksctl.md
+
+>>> create a pod
+                         pod
+                        /   \
+                       /     \
+deploy-----> replicaset      svc(loadbalancer type)
+                       \      /
+                        \    /
+                          pod 
+
+
+goto ec2 eks_bootstrap_server
+
+>> sudo su -
+>> kubectl create deployment demo-nginx --image=nginx --port=80 --replicas=2
+
+>> kubectl get deployment
+>> kubectl get deploy
+>> kubectl get replicaset
+>> kubectl get pods
+>> kubectl get all
+note: created 2pods
+      created service
+      created deployment
+      created replicaset
+
+>> kubectl expose deployment demo-nginx --port=80 --type=LoadBalancer
+>> kubectl get all
+
+goto browser and access the nginx default page
+
+#### create first manifest file
+
+>> kubectl delete deployment demo-nginx
+note: delete deployment and pods and replicasets
+>> kubectl get all
+>> kubectl delete service/demo-nginx
+>> kubectl get all
+
+How to create a manifest file to create pod or service
+
+
+goto -> kubernetes api documentation
+
+goto google -> pod manifest file kubernetes
+
+>> vi pod.yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo-app
+#  labels:
+#    app: demo-app
+
+spec:
+  containers:
+    - name: demo-nginx
+      image: nginx
+      ports:
+        - name: demo-nginx
+          containerPort: 80
+
+
+#### Create a service manifest file
+
+goto google -> service manifest file kubernetes
+
+>> vi service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-service
+
+spec:
+  ports:
+  - name: nginx-port
+    port: 80
+    targetPort: 80
+
+  type: LoadBalancer
+
+create a pod
+>> kubectl apply -f pod.yml
+>> kubectl get all
+
+create a service
+>> kubectl apply -f service.yml
+>> kubectl get all
+
+
+
+setup pods and service
+
+                      Selector:     Labels
+                    app: demo-app   app: demo-app 
+external service------->svc--------->Pod
+                      service
+
+
+
+####  Using labels and selector
+
+update the manifest files
+
+>> vi pod.yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo-app
+  labels:
+    app: demo-app
+
+spec:
+  containers:
+    - name: demo-nginx
+      image: nginx
+      ports:
+        - name: demo-nginx
+          containerPort: 80
+
+
+>> vi service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-service
+
+spec:
+  ports:
+  - name: nginx-port
+    port: 80
+    targetPort: 80
+  
+  selector:
+    app: demo-app
+
+  type: LoadBalancer
+
+>> kubectl apply -f pod.yml
+>> kubectl get all
+>> kubectl apply -f service.yml
+>> kubectl describe service/demo-service
+>> kubectl get pod -o wide
+
+
+
+#### Integrating Kubernetes in CI/CD pipeline
+
+>>> Write a deployment file
+
+delete the pod
+>> kubectl delete pod demo-pod
+>> kubectl get pods
+>> kubectl delete service/demo-service
+>> kubectl get all
+
+>> vi regapp-deployment.yml
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: devmax-regapp
+  labels:
+    app: regapp
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: regapp
+
+  template:
+    metadata:
+      labels:
+        app: regapp
+    spec:
+      containers:
+      - name: regapp
+        image: devmax/regapp
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+>> This is Deployment name and Deployment label
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: devmax-regapp
+  labels:
+    app: regapp
+
+>> This is template to create a pod
+template:
+    metadata:            # this is pod definition
+      labels:
+        app: regapp
+    spec:
+      containers:         # this is container definition
+      - name: regapp
+        image: devmax/regapp   # this is image name
+        imagePullPolicy: Always # Always pull latest image
+        ports:
+        - containerPort: 8080 #port thatcontainerlisting on
+>> This is create 2 pods from the pod template
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: regapp
+
+>> this is make sure only one pod updated at a time
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+>> This is Service file
+>> regapp-service.yml
+apiVersion: v1
+kind: Service
+
+metadata: 
+  name: devmax-service
+  labels:
+    app: regapp
+spec:
+  selector:
+    app: regapp
+
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+  type: LoadBalancer
+
+>> this is resource type
+apiVersion: v1
+kind: Service
+
+>> this is service name label             
+metadata: 
+  name: devmax-service
+  labels:
+    app: regapp
+
+>> This is To which deployment it can send traffic
+spec:
+  selector:
+    app: regapp
+
+>> what is the service type
+  type: LoadBalancer
+
+>> port number exposed at cluster level
+  ports:
+    - port: 8080
+      targetPort: 8080 # port that container listening
+
+
+#### use deployment and service files to create and access pod
+
+ref:
+goto github.com/yankils/Simple-Devops-Project/tree/master/Kubernetes
+
+regapp-deploy.yaml
+regapp-service.yaml
+
+>> kubectl get all
+>> cat regapp-deployment.yml
+>> vi regapp-deployment.yml
+spec:
+  replicas: 3
+
+>> kubectl apply -f regapp-deployment.yml
+>> kubectl get all
+note: 3 deployments and replicasets are ready.
+>> kubectl get pod -o wide
+>> cat regapp-service.yml
+>> kubectl apply -f regapp-service.yml
+>> kubectl get all
+>> kubectl describe service/devmax
+>> kubectl get pod -o wide
+>> kubectl get pods
+>> kubectl pod devmax-8743fdddj-dfhdhj
+note:pod is deleted
+>> kubectl get pods
+
+
+
+#### Integrate kubernetes bootstrap server with ansible
+
+>>>  Integrate kubernetes with ansible
+
+
+Ansible--------------> kubernetes
+
+ ++ on Bootstrap server
+    ++ Create ansadmin
+    ++ Add ansadmin to sudoers files
+    ++ Enable password based login
+
+
+ ++ On Ansible Node
+    ++ Add to hosts file
+    ++ Copy ssh keys
+    ++ Test the connection
+
+
+goto ec2 ansible server
+>> sudo su -
+>> sudo su - ansadmin
+>> cd /opt/docker
+>> ll
+>> mv regapp.yml create_image_regapp.yml
+>> cat create_image_regapp.yml
+>> cat deploy_regapp.yml
+>> mv deploy_regapp.yml docker_deployment.yml
+>> ll
+>> vi hosts
+localhost
+
+[kubernetes]
+kubernetes-private-ip
+
+[ansible]
+ansible-server-privateip
+>> ssh-copy-id <k8s-private-ip>
+>> ansible -i hosts all -a uptime
+>>
+
+
+goto ec2  kubernetes bootstrap server           
+>> sudo su -
+>> useradd ansadmin
+>> passwd ansadmin
+>> visudo
+ansadmin   ALL=(ALL)      NOPASSWD: ALL
+>> vi /etc/ssh/sshd_config
+PasswordAuthentication yes
+#PasswordAuthentication no
+>> service sshd reload
+>> ifconfig
+
+
+#### Create ansible playbooks for deploy and service files
+
+goto ec2 ansible server
+>> sudo su - ansadmin
+>> cd /opt/docker
+>> ls
+>> vi kube_deploy.yml
+---
+- hosts: kubernetes
+#  become: true
+  user: root
+
+  tasks:
+  - name: deploy regapp on kubernetes
+    command: kubectl apply -f regapp-deployment.yml
+
+
+>> vi kube_service.yml
+---
+- hosts: kubernetes
+#  become: true
+  user: root
+
+  tasks:
+  - name: deploy regapp on kubernetes
+    command: kubectl apply -f regapp-service.yml
+
+
+
+goto ec2 kubernetes bootstrap server
+>> kubectl delete -f regapp-service.yml
+>> kubectl delete -f regapp-deployment.yml
+>> kubectl get all
+
+
+goto ec2 ansible server
+>> sudo su - ansadmin
+>> ansible-playbook -i /opt/docker/hosts kube_deploy.yml
+>> ssh-copy-id root@<kubernetesbootstrapip>
+>> 
+
+goto ec2 k8s server
+>> sudo su -
+>> passwd root
+
+goto ec2 ansible server
+>> sudo su - ansadmin
+>> ansible-playbook -i /opt/docker/hosts kube_deploy.yml
+
+
+goto ec2 k8s server
+>> sudo su -
+>> kubectl get pods
+
+goto ec2 ansible server
+>> sudo su - ansadmin
+>> ansible-playbook -i /opt/docker/hosts kube_service.yml 
+
+goto ec2 k8s server
+>> kubectl get all
+
+#### create jenkins deployment job for kubernetes
+
+>>> Deploying as a pod
+
+goto jenkins server and login to jenkins
+
+create new item -> Deploy_on_kubernetes -> Freestyle -> ok
+
+goto post build actions -> send build artifacts over ssh->
+
+Name -> ansible-server
+Exec command ->
+
+ansible-playbook -i /opt/docker/hosts/ /opt/docker/kube_deploy.yml;
+ansible-playbook -i /opt/docker/hosts/ /opt/docker/kube_service.yml
+
+apply and save
+
+
+
+goto ec2 k8s server
+>> sudo su -
+>> kubectl get all
+
+delete the existing deployments 
+>> kubectl delete deployment.apps/devmax-regapp
+>> kubectl delete service/devmax-service
+>> kubectl get all
+>> 
+
+goto jenkins dashboard
+
+buildnow
+
+goto ec2 k8s sever
+>> kubectl get all
+
+
+goto ec2 ansible server
+>> sudo su - ansadmin
+>> vi kube_deploy.yml
+---
+- hosts: kubernetes
+  user: root
+
+  tasks:
+    - name: deploy regapp on kubernetes
+      command: kubectl apply -f regapp-deployment.yml
+
+    - name: create service for regapp
+      command: kubectl apply -f regapp-service.yml
+
+
+>> goto jenkins dashboard
+
+configure 
+
+post build actions -> Exec command
+remove the service job
+
+apply and save
+
+Buildnow
+
+goto ec2 k8s server
+>> kubectl get all
+
+
+#### CI job to create image for kubernetes
+
+goto jenkins dashboard
+
+rename the project -> Deploy_On_Kubernetes -> RegApp_CD_Job -> Rename
+
+
+create a newitem -> RegApp_CI_Job
+copy from Copy_Artifacts_onto_Ansible -> ok
+
+General -> Build code with help of maven and create an image on ansible and push it onto dockerhub
+
+Exec command ->
+ansible-playbook /opt/docker/create_image_regapp.yml;
+
+apply and save
+
+
+goto gitbash
+
+>> clone the hello-world project
+>> vi index.jsp
+enter mobile no
+
+>> git status
+>> git add .
+>> git commit -m "updated mobile number"
+>> git push origin master
+>> 
+
+goto jenkins dash board
+
+goto Copy_Artifacts_onto_Ansible ->
+disable poll scm
+
+apply and save
+
+Buid now or automatically trriggered the job because of poll scm
+
+
+#### Enable rolling update to create pod from latest docker image
+
+>>> Deploying on kubernetes
+
+goto jenkins dashboard
+
+goto RegApp_CI_Job -> configure -> 
+post build actions -> Build other projects
+
+projects to build -> RegApp_CD_Job,
+
+apply and save
+
+goto ec2 k8s server
+>> kubectl get all
+
+goto gitbash
+
+>> vi index.html
+Enter Full Name
+>> git status
+>> git add .
+>> git commit -m "updated username field"
+>> git push origin master
+>> 
+
+goto dockerhub and check the image updted or not
+
+goto ec2 k8s server
+>> kubectl get all
+>> 
+
+
+goto ec2 ansible server
+>> sudo su -
+>> sudo su - ansadmin
+>> cd /opt/docker
+>> vi kube_deploy.yml
+---
+- hosts: kubernetes
+# become: true
+  user: root
+
+  tasks:
+    - name: deploy regapp on kubernetes
+      command: kubectl apply -f regapp-deployment.yml
+
+    - name: create service for regapp
+      command: kubectl apply -f regapp-service.yml
+
+    - name: updte deployment with new pods if image updated in docker hub
+      command: kubectl rollout restart deployment.apps/devmax-regapp
+
+
+#### Complete CI and CD job to build and deploy code on kubernetes
+
+>>> Deploying on Kubernetes
+
+goto gitbash
+
+>> vi index.jsp
+New user Register for Devops Learning
+>> git status
+>> git commit -am "updated header"
+>> git push origin master
+>> 
+
+
+goto jenkins dash board REgApp_CI_job
+
+automatically trigger the job because of pollscm
+
+
+goto ec2 ansible server
+
+updated war file .
+
+goto dockerhub 
+
+updated image
+
+goto ec2 k8s server
+
+>> kubectl get all
+
+
+goto browser and check the regapp status ,its updated
+
+
+goto gitbash
+
+</div>          
+<h1> Thankyou, Happy Learning </h1>
+</form>
+
+>> git commit -am "thank you"
+>> git push origin master
+
+goto ec2 k8s server
+>> kubectl get all
+
+#### Clean up Kubernetes setup
+
+goto ec2 k8s server
+
+>> kubectl delete deployment.apps/devmax-regapp
+note: delete the deployments
+
+>> kubectl get all
+>> kubectl delete service/devmax-service
+note: delete the service
+
+>> kubectl get nodes
+>> eksctl delete cluster valaxy --region ap-south-1
+note : delete clusters 
+valaxy or devmax
+
+goto aws dashboard -> delete the all instances using this project.
+
+-----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,118 @@
+devops playlist:-
+---------------------------------
+ansible 
+
+https://www.youtube.com/watch?v=goclfp6a2IQ&list=PL2_OBreMn7FqZkvMYt6ATmgC0KAGGJNAN
+
+
+
+Elastic Stack -ELK
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GbBldOq_rlkyD3_hjJRHVmr
+
+Apache Kafka
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GYULTFoqPE3eb_DpdNkgJlV
+
+DevOps Master Program Playlist:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GaiMWN0FUqtTb44KKWYqrBs
+
+DevOps Realtime Project Playlist:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1Ga9JI0zxC3i--lXTAVLdhel
+
+DevOps Month Complete Playlist: (DevOps 2020)
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GZHUPpxbf4ixMJydpxoXQMS
+
+DevOps Project Ideas and Misellineous Playlist:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GYXH51atXNpDste7_51Kfq9
+
+Practical DevOps:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GaGyxM-XUMGKla78OHJKTv5
+
+AWS DevOps Playlist : (InProgrss)
+
+https://www.youtube.com/playlist?list=PLd8alL65M1Gbz9o795lV-0O-X2tQY9SSl
+
+DevSecOps Playlist:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GbXrmK_IWzEoa-PdCCd1OXt
+
+Docker and Kubernetes:
+Docker In Telugu Playlist:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GZEznEnAlZl4WBlz_azT6Zj
+
+Kubernetes In Telugu:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GZ2jyltUiH5rYFZ-Wx3vGrp
+
+Kubernetes CKAD In Telugu:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1Gb__sn5vaDrYTEhPLBoU3e8
+
+Kubernetes RealTime Project:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GYYIPtoQRLJJsk_niit1dU_
+
+CKA Playlist:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GbJR1IOjfoe9Ja7yEpmbNsD
+
+AWS EKS:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GZsLJaD6QxeA3fKBV0ZDLJN
+
+DevOps Tools:
+Jenkins:
+Jenkins Playlist:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GYeoNjVueKjxExid2PoN-B8
+
+Ansible:
+Ansible in Telugu Playlist:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GZXkfgwk9eyUeQ3sAAkEIj0
+
+Git GitHub:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1Gax47K4rK6u9po5pWnGWcuU
+
+OpenShift In Telugu:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1Ga6rr9G6LeQrm4qyd5q_pEl
+
+GitOps In Telugu:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GanssoaxJetub4f6l3mvaDM
+
+Terraform:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GZ3rJx2gdnQvhbFpBF9Oh9j
+
+Multi Cloud:
+Cloud Master Program Playlist:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GZdOXrvRxgiWDozdyeCzI-P
+
+AWS RealTime Playlist:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1Gb_ffVmmsUNVCHmXUUGBOLO
+
+AWS CLoud In Telugu(2020):
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GYzVDR71F6raOlWiK4X8L4Q
+
+Cloud COmputing:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1GbqwobKu8rxe6mG-ksdV8ea
+
+Linux:
+RHCSA Series:
+
+https://www.youtube.com/playlist?list=PLd8alL65M1Ga6jXJgAfObhHJAsbyn5Rgn
+

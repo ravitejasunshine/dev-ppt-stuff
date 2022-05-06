@@ -1,0 +1,54 @@
+Devops overview
+>>>> How To Prepare DevOps in 6Months 
+
+Pre-requisites ->Devops ->
+week-1
+>> why devops?
+>> Roadmap of devops
+>> waterfall methods,SDLC process 
+>> what is agile process
+>> what are the tools using in Devops
+
+week-2
+>> Linux Basics to advanced
+>> bash scripting or shell scripting
+
+week-3
+>> Git and Github
+>> what devops engineer does in git
+
+week-4
+>> maven or gradle or NPM
+
+week-5
+>> cloud & IAAS 
+>> Tomcat and Http server
+>> sonarqube 
+
+week-6
+>> Repo manager
+ex:-Nexus
+
+week-7 & week-8
+>> Containers & Docker
+
+week-9 & week-10
+>> jenkins & CI/CD tool
+
+week-11 & week-12
+>> Aws 
+ec2,s3,vpc,elastic load balancer(ELB),auto scaling,elastic ips,IAMs,securities,aws cli,
+
+week-13,14,15,16
+>> kubernetes
+>> how to deploy on aws server
+
+week-17,18
+>> IAC(terraform)
+
+week-19,20
+>> Ansible
+>> monitoring (promethies)
+
+week-21,22,23
+>> project 

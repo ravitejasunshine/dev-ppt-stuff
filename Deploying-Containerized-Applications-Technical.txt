@@ -1,0 +1,349 @@
+just for learning stuff purpose don't practice
+Deploying Containerized Applications Technical Overview
+--------------------------------------------------------
+>>> Docker overview
+
+--------------------------------------------------------
+				>>> Image management
+>> docker search mysql
+>> docker search hello-openshift
+>> docker pull openshift/hello-openshift
+>> docker images
+>> docker rmi openshift/hello-openshift  (#remove the image)
+>> docker images
+
+### container image commands
+# docker images
+# docker search image_name
+# docker pull image_name
+# docker rmi image_name
+
+### main mysql container image parameters
+# MYSQL_ROOT_PASSWORD
+# MYSQL_DATABASE
+# MYSQL_USER
+# MYSQL_PASSWORD
+
+>> docker search mysql | grep docker.io/mysql
+>> docker pull mysql
+>> docker images | grep mysql
+>> docker run -d --name mysql \
+-e MYSQL_ROOT_PASSWORD=changeme -e MYSQL_DATABASE=items \
+-e MYSQL_USER=user1 -e MYSQL_PASSWORD=mypa55 \
+mysql
+>> docker ps (# running containers)
+
+## inside of the container
+>> docker exec -it mysql bash
+> env | grep MYSQL
+> exit
+>> docker stop mysql
+>> docker ps -a
+>> docker rm mysql
+>> docker ps -a 
+
+------------------------------------------------------------
+			>>> container manipulation
+## run the container
+>> docker run openshift/hello-openshift
+>> kill the process
+>> docker run -it openshift/hello-openshift /bin/bash
+>> kill the process
+>> docker ps (# active containers)
+openshift
+>> docker stop <container-id>
+>> docker ps  
+>> docker ps -a (# inactive containers)
+>> docker run -d openshift/hello-openshift
+>> docker ps
+35952c5c1373 openshift
+>> docker logs 359
+>> docker inspect 359 | grep IPAddress
+>> docker stop angry_babbage
+>> docker rm angry_babbage
+>> docker run -d --name mysql \
+-e MYSQL_DATABASE=items \
+-e MYSQL_USER=user1 \
+-e MYSQL_PASSWORD=mypa55 \
+-e MYSQL_ROOT_PASSWORD=r00tpa55 \
+-p 30306:3306 mysql
+>> docker ps (# running containers)
+>> ip addr | grep eth1
+192.168.1.101
+>> mysql -h 192.168.1.101 -P 30306 -uuser1 -pmypa55 items
+> show tables
+> source ~/do080/deploy/jee/linked/db.sql
+> select * from items;
+> \q  (#exit of mysql)
+>> docker exec -it mysql bash
+>> mysql -h $HOSTNAME -uuser1 -pmypa55 items
+>> select * from Items
+> \q
+>> exit
+>> docker stop mysql
+>> docker rm mysql
+-----------------------------------------------------------
+			>>>>  Persistent Storage
+
+## configure a host floder for container use
+# mkdir /var/dbfiles
+# chmod o+rwx /var/dbfiles
+# chcon -t svirt_sandbox_file_t /var/dbfiles
+
+>> sudo mkdir -p /var/local/mysql
+>> sudo chmod o+rwx /var/local/mysql
+>> sudo chcon -t svirt_sandbox_file_t /var/local/mysql
+>> docker run -d --name mysql -e MYSQL_DATABASE=items -e MYSQL_USER=user1 -e MYSQL_PASSWORD=mypa55 -e MYSQL_ROOT_PASSWORD=r00tpa55 -p 30306:3306 -v /var/local/mysql:/var/lib/mysql mysql
+>> docker ps (#running containers)
+>> ls /var/local/mysql
+>> docker logs -f mysql
+----------------------------------------------------------
+>>>> Coordination of Multi-Container Applications
+## To-Do List application multi-container architecture
+
+|--------------------|                  --------------
+| To-Do List JEE     |<---------------> | Database   |
+|			         |                  |            |
+----------------------                  --------------
+ WideFly Container                      MYSQL Container
+
+ ## Running To-Do List using Docker links
+ # docker run --link container_name:alias 
+ [other_options] image_name
+
+ # docker run --link mysql:mysql \
+ -d -e MYSQL_DB_NAME=items \
+ --name wildfly \
+ -p 30080:8080 do080/todojee
+
+ ## build the application server image
+ >> cd ~/do080/images/jee
+ >> ls
+ >> less Dockerfile
+phone images
+
+ >> less build.sh
+ #!/bin/bash
+
+ docker build -t do080/wildfly .
+ >> ./build.sh
+ >> docker images
+ >> docker run -d --name wildfly do080/wildfly
+ >> docker ps 
+ 37f62557f2ac  do080/wildfly
+ >> docker logs -f 37f
+ >> curl http://localhost:8080/healthz/ping
+ >> docker stop wildfly
+ >> docker rm wildfly
+ >> cd ~/do080/images/jee
+ >> ls
+ >> less Dockerfile
+ FROM    do080/wildfly
+
+ MAINTAINER    devsec
+
+ ADD     ./etc/modules ${JBOSS_HOME}/modules
+ ADD     ./etc/standalone.conf ${JBOSS_HOME}/bin/
+ ADD     ./etc/wait.sh ${JBOSS_HOME}/bin/
+ ADD     ./etc/standalone.xml ${JBOSS_HOME}/standalone/configuration/
+ ADD     ./build/target/todo.war ${JBOSS_HOME}/standalone/deployments/
+
+ >> less build.sh
+ #!/bin/bash
+
+ rm -fr build
+ mkdir -p build
+ cp -a ../../apps/jee/* build
+ cd build
+ mvn clean install
+ if [ $? -eq 0 ]; then
+   cd ..
+   docker rmi do080/todojee
+   docker build -t do080/todojee .
+ fi
+>> ./build.sh
+>> docker images | grep todojee
+>> docker images
+>> cd ~/do080/deploy/jee/linked/
+>> ls
+>> less ./run.sh
+#!/bin/bash
+if [ ! -d "data" ]; then
+  echo "Create database volume..."
+  sudo mkdir -p /var/local/mysql/data /var/local/mysql/initdb   
+  sudo chcon -Rt svirt_sandbox_file_t /var/local/mysql/data /var/local/mysql/initdb
+  sudo chmod o+rwx /var/local/mysql/data
+  sudo cp db.sql /var/local/mysql/initdb
+else
+  rm -fr /var/local/mysql/initdb*
+fi
+
+docker run -d --name mysql -e MYSQL_DATABASE=items -e MYSQL_USER=user1 -e MYSQL_PASSWORD=mypa55 -e MYSQL_ROOT_PASSWORD=r00tpa55 -v /var/local/mysql/data:/var/lib/mysql -v /var/local/mysql/   initdb:/docker-entrypoint-initdb.d -p 30306:3306 mysql
+
+docker run -d -e MYSQL_DB_NAME=items --link mysql:mysql --name wildfly -p 30080:8080 do080/todojee
+
+>> ./run.sh
+>> docker ps
+449c92c9683c    do080/todojee
+>> docker logs 449
+>> docker exec -it wildfly bash
+> env | grep MYSQL
+> exit
+>> less stop.sh
+#!/bin/bash
+docker stop wildfly
+docker rm wildfly
+docker stop mysql
+docker rm mysql
+>> ./stop.sh
+---------------------------------------------------------
+		>>>> Container Orchestration with Kubernetes
+# master
+# node
+# pod 
+# service
+# Replication controller
+
+## Creating kubernetes resources
+# kubectl create -f \
+/path/to/json_or_yaml_file
+
+## kubernetes pod resource definition
+apiVersion: v1
+kind: Pod
+metadata:
+  name: wildfly
+  labels:
+    name: wildfly
+spec:
+  containers:
+    - resources:
+        limits:
+        cpu: 0.5
+      image: do080/todojee
+      name: wildfly
+      ports:
+        - containerPort: 8080
+           name: wildfly
+      env:
+        - name: MYSQL_ENV_MYSQL_DATABASE
+
+       ... other env variables omitted ...
+
+## creating kubernetes resources
+# kubectl create -f \
+/path/to/json_or_yaml_file
+
+## kubernetes service resource definition
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: wildfly
+    spec:
+    ports:
+      - port: 8080
+        nodeport: 30080
+    selector:
+      name: wildfly
+    type: NodePort
+
+-------------------------------------------------------
+			>>>> openshift enterprise features
+--------------------------------------------------------
+			>>>> OpenShift Enterprise Web Console
+## diagram
+hexboard application infrastructure using openshift enterprise.
+
+user web browser<------------>OSE Route<------>OSE Service
+                                                    ^
+                                                    |
+                                                    |
+    -------------------------------------------------
+    |
+    |
+    ^
+Hexboard Pod
+
+HTML5 + Node.js<---------> OSE     <---------->Sketch Pod
+ Front end                 Service             Node.js REST
+                                               Back end
+
+ -------------------------------------------------------
+ 		>>>> Source-to-Image
+## creating an application using S2I
+$ oc new-app [options] \
+builder_is~http[s] : //git_repository_url \
+--name=app_name
+
+$ oc new-app -e MYSQL_DATABASE=test \
+nodejs~https://github.com/me/myapp \
+--name=awesomeapp
+
+## openshift Template, #1/2
+{
+  "kind": "Template",
+  "apiVersion": "v1",
+  "metadata": {
+      "name": "mysql-persistent",
+      "creationTimestamp": null,
+      "annotations": {
+          "description": "MySQL database service, with persistent storage.Scaling to more than one replica is not supported",
+          "iconClass": "icon-mysql-database",
+          "tags": "database,mysql"
+      } 
+  },
+  "objects": [
+      {
+          "kind": "Service",
+          "apiVersion": "v1beta3",
+          "metadata": {
+              "name": "${DATABASE_SERVICE_NAME}",
+              "creationTimestamp": null
+          },
+    "parameters": [
+            {
+                "name": "DATABASE_SERVICE_NAME",
+                "description": "Database service name",
+
+                "value": "mysql"
+            },
+            {
+                "name": "MYSQL_USER",
+                "description": "Username for MYSQL user that will be used for accessing the database",
+
+                "generate": "expression",
+                "from": "user[A-Z0-9]{3}"
+            },
+            {
+                "name": "MYSQL_PASSWORD",
+                "description": "Password for the MYSQL user",
+                "generate": "expression",
+                "from": "[a-zA-Z0-9]{16}"
+            },
+----------------------------------------------------------
+>>>> Introduction to OpenShift Enterprise CLI 
+
+## Openshift CLI general syntax
+
+$ oc action [options] \
+[resource_type] [resource_name_or_id]
+
+## Basic OSE CLI actions
+> types
+> login/logout
+> new-project
+> new-app
+> status
+> project
+> describe
+> get / create / edit/ delete
+>  start-build / build-logs 
+
+----------------------------------------------------------
+>>>> Scaling an Application
+
+## openshift cli scaling general syntax
+$ oc scale dc [dc_name_or_id] \
+--replicas=number
+          

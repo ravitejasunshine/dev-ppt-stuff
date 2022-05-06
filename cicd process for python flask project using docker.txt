@@ -1,0 +1,106 @@
+cicd process for python flask project using docker,gitlab & aws ecs
+-------------------------------------------------------------
+
+>> what is ci/cd process
+ ++ ci/cd is continuous integration & continuous Delivery.
+ ++ Enables automation for build,test and deployment.
+ ++ focus on development rather that deployment and build process.
+
+ content:-
+
+  Flask---------->docker---------->dockerhub 
+    |               |             ^     |
+    |               |             |     |
+    ^               ^ ^-----------|     ^
+    Gitlab-------->cicd--------------->AWS ECS        
+
+
+ setting up the project :-
+ ----------------------   
+
+ 1. setup python virtual environment
+
+ 2. create and run python flask application
+
+ 3. Building the Dockerfile and running the container
+
+ 4. Pushing the Docker image to Dockerhub
+
+
+>> python3 -m venv env
+>> source env/bin/activate
+>> pip install flask
+
+>> app.py
+		
+	import flask
+	
+	app = flask.Flask(__name__)   		#creating restapi
+
+	@app.route('/',methods=['GET'])     #display dummydata
+	def home():                         # methodname is home
+	    return "<h1>Welcome to Flask App</h1>"
+
+	if __name__== '__main__':   #app runs in debug mode      
+	    app.run(debug=True,host="0.0.0.0")     
+
+>> python app.py
+
+goto google -> localhost:5000
+
+## create a Dockerfile
+>> pip freeze > requirements.txt
+>> Dockerfile
+RUN apt-get update -y && \
+    apt-get install -y python-pip python-dev
+
+COPY ./requirements.txt /app/requirements.txt
+
+WORKDIR /app
+
+RUN pip install -r requirements.txt
+
+COPY . /app
+
+ENTRYPOINT [ "python" ]
+
+CMD ["app.py"]
+
+>> docker build -t flaskapp .
+>> docker images
+
+# login to docker account
+>> create a new repository
+>> docker login --username="abcusename"
+password:
+>> docker tag flaskapp dockerusername/flaskapp:latest
+>> docker images
+>> docker image push dockerusername/flaskapp:latest
+>> 
+## goto github or gitlab
+
+project name -> FlaskApplicationRepo -> public -> create project
+
+project push into gitlab or github.
+
+## CI/CD setup
+
+>> creaet a new repository on gitlab and push the project code into that
+
+>> setup local Gitlab runner.
+
+>> create a new AWS ECS cluster and link the image to Dockerhub.
+
+>> configure .gitlab-ci.yml file and run the pipeline
+
+# goto google gitlab runner
+# create  a ecs on aws 
+# create a yml file -> .gitlab-ci.yml
+
+https://www.youtube.com/watch?v=vb7w7jnkD2s&t=9s
+
+
+
+
+
+

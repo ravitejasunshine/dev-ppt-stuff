@@ -1,0 +1,36 @@
+sonarqube integration with jenkins:-
+----------------------------------
+
+https://www.youtube.com/results?search_query=sonarqube+installation+and+integration+with+jenkins
+
+----------------------------------------------------------------------------------------
+				>>> terraform learning
+
+>> terraform project 
+
+https://www.youtube.com/results?search_query=terraform+project
+
+
+>> https://www.youtube.com/results?search_query=terraform+project
+
+https://www.youtube.com/results?search_query=terraform+integration+with+jenkins
+
+>> terraform integration with jenkins
+
+https://www.youtube.com/results?search_query=terraform+integration+with+jenkins
+
+>> DevOps Project 1 | Terraform Jenkins AWS EC2 | Simple DevOps project for CI/CD
+
+https://www.youtube.com/watch?v=I3AYnDSVyYE
+
+>> Simple DevOps Project-2 | Simple DevOps project for CI/CD | CI/CD through Jenkins Terraform Project 
+
+https://www.youtube.com/watch?v=R1i5UOjxZcQ
+
+
+>>> Mastering Terraform - Integrating with Jenkins and Ansible
+
+>>> deploy java application into kubernetes
+
+
+

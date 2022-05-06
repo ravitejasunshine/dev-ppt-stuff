@@ -1,0 +1,35 @@
+devops projects:
+------------------------------
+Integration methods:-
+
+>> python integration
+https://www.youtube.com/results?search_query=cicd+with+python+project
+
+>> devops-projects
+https://www.youtube.com/watch?v=8D46Pgbz0gg&list=PLxzKY3wu0_FJdJd3IKdiM4Om1hGo2Hsdt
+
+>> Gitlab CI/CD for Docker, Python Flask, AWS ECS Dev Ops | Gitlab CI/CD Docker Deployment on AWS ECS.
+
+https://www.youtube.com/watch?v=vb7w7jnkD2s
+
+
+>> Simple DevOps Project-2 | CI/CD pipeline using GIT, Jenkins & Ansible
+
+https://www.youtube.com/watch?v=nE4b9mW2ym0
+
+>> DevOps Project – Running CI/CD using Git, Jenkins, Ansible & Tomcat
+
+https://www.youtube.com/watch?v=nUJkCswBrfQ&t=1s
+
+>> DevOps Project with GITHUB,AWS,Ansible
+
+https://www.youtube.com/watch?v=_wMQXQSCS_8
+
+>> cicd with ansible integration
+
+https://www.youtube.com/results?search_query=cicd+with+ansible+integration
+
+>> Complete DevOps Project | Github, Docker, Dockerhub, Git, Jenkins, Ansible
+
+https://www.youtube.com/watch?v=gvk9jZz0P6s
+

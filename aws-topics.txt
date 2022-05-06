@@ -1,0 +1,222 @@
+AWS learning:-
+
+ansible playbook integration with jenkins
+-------------------------------------------------------------
+>> IAM & AWS CLI 
+>> EC2
+>> S3
+>> Cloudfront
+>> VPC (completed)
+>> RDS 
+https://www.youtube.com/watch?v=OhN2HNE1Lbc&list=PL35ft-0sAlPhjfPb-rPrGEPOxrRnH6EFh
+>> ELB
+>> EBS
+>> Autoscaling Group
+>> Autoscaling Launch Config
+>> Elastic Bean stalk
+>> cloud formattion
+>> Dynamodb
+>> api gateway (completed)
+>> aws lambda
+>> 
+
+
+
+SNS(notifications), SQS(simple queuing), and RDS (Relational Database Service)
+
+    The AWS Fundamentals: IAM, EC2, Load Balancing, Auto Scaling, EBS, EFS, Route 53, RDS, ElastiCache, S3, CloudFront
+
+    The AWS CLI: CLI setup, usage on EC2, best practices, SDK, advanced usage
+
+    In-Depth Database comparison: RDS, Aurora, DynamoDB, Neptune, ElastiCache, Redshift, ElasticSearch, Athena
+
+    Monitoring, Troubleshooting & Audit: AWS CloudWatch, CloudTrail
+
+    AWS Integration & Messaging: SQS, SNS, Kinesis
+
+    AWS Serverless: AWS Lambda, DynamoDB, API Gateway, Cognito
+
+    AWS Security best practices: KMS, SSM Parameter Store, IAM Policies
+
+    VPC & Networking in depth
+
+    AWS Other Services Overview: CICD (CodeCommit, CodeBuild, CodePipeline, CodeDeploy), CloudFormation, ECS, Step Functions, SWF, EMR, Glue, OpsWorks, ElasticTranscoder, AWS Organizations, Workspaces, AppSync, Single Sign On (SSO)
+
+    Tips to ROCK the exam
+
+
+As an AWS associate, what are the topics we have to learn?
+
+So as you are pursuing AWS associate in Architect level the topics you can cover for clearing your examination and for your certification:
+
+Introduction to AWS
+
+    Elastic computing
+    Introduction to the AWS products
+    Regions and Availability Zones
+    Signing up for AWS
+    AWS Free usage tier
+    Introduction AWS management console
+
+EC2 Instances
+
+    Understanding AMI
+    Launching your first AWS instance
+    On-demand Instance pricing
+    Reserved Instance pricing
+    Spot instance pricing
+    Setting up security
+    Security groups
+    Choosing the AMI
+    Creating a new AMI
+    IP Addressing Scheme
+    Public and Private IP’s
+    Deploying a new instance from the created AMI
+    AMI Migration
+    Key Pairs
+    Elastic IP’s
+
+ELB (Elastic Load Balancer)
+
+    Introduction to ELB
+    Basic ELB concepts
+    Internet-facing ELB
+    VPC – facing ELB
+    Create an ELB (Elastic Load Balancer)
+    Adding and removing instances on ELB
+
+EBS (Elastic Block Storage)
+
+    Create EBS volumes
+    Delete EBS Volumes
+    Attach and detach EBS volumes
+    Mounting and un-mounting EBS volume
+    Creating and deleting snapshots
+    Creating volumes from snapshots
+
+Cloud Watch
+
+    Cloud watch dashboard
+    Configuring Monitoring services
+    Setting thresholds
+    Configuring actions
+    Creating a cloud watch alarm
+    Getting statistics for EC2 instances
+    Monitoring other AWS services
+    Configuring Notifications
+    Integrating cloud watch with Autoscaling
+
+Simple Notification Service (SNS)
+
+    What is SNS?
+    Creating a topic
+    Create subscription
+    Subscribed to the subscription (SQS, Email, Email-Jason, SMS, HTTP, HTPPS, Application)
+
+SES (Simple Email Services)
+
+SQS (Simple Queue Service)
+
+Auto-scaling
+
+    Horizontal vs. vertical scaling
+    Bootstrapping
+    Create a launch configuration
+    Create an Auto Scaling group
+    Create a policy for your Auto Scaling group
+    Set up an auto-scaled, load-balanced Amazon EC2 application
+
+Identity access management (IAM)
+
+    Creating Users and Groups
+    Applying policies
+    Password Policy
+    Roles
+    Command line management
+
+Elastic Beanstalk
+
+    Creating an environment
+    Application versioning
+    Deploying a sample app
+    What is S3?
+    RRS (Reduced Redundancy storage)
+    S3 durability and redundancy
+    S3 Buckets
+    S3 Uploading Downloading
+    S3 Permissions
+    S3 Object Versioning
+    S3 Lifecycle Policies
+
+Glacier Storage
+
+Route53
+
+    Creating Zones
+    Hosting a website
+    Understanding routing policies
+    Weighted simple and failover policies
+
+Relational Database Service (RDS)
+
+    Selecting the Database type
+    Configuring the database
+    Creating a database
+    Configuring backups
+    Configuring the maintenance windows
+    Connecting to the database
+
+Cloud Formation
+
+    What is cloud formation?
+    Deploying template
+    Create Stack
+    Delete Stack
+    Provisioning application resources with Cloud Formation
+
+Cloud Front
+
+    Use of cloud front
+    Creating a cloud front distribution
+    Hosting a website of cloud front distribution
+    Implementing restrictions
+    Configuring origins and behaviours
+    CDN (Content Delivery Network)
+
+Amazon Virtual Private Cloud (VPC)
+
+    What is VPC?
+    VPC configuration
+    VPC security
+    Elastic IP’s
+    Inbound and outbound ACL’s
+    Dynamo DB
+    Creating a Dynamo DB
+    Configuring alarms
+    Adding data manually
+
+Project and AWS Case study
+
+    Creating and managing two-tier application (WEB and DB) on AWS
+    Creating and managing three-tier application (APP, WEB and DB) on AWS
+    Migrating On-Premise application to AWS Cloud
+
+Creating and managing two-tier application (WEB and DB) on AWS.
+
+    Best practices for AWS
+    Cost control strategies
+    Overview of AWS certification
+
+AWS troubleshooting
+
+    Troubleshooting EC2 instances
+    Troubleshooting using Cloud Watch
+    Troubleshooting using ELB
+    Using Cloud Trail
+
+Trusted Advisor
+
+    Cost Optimization
+    Performance
+    Security
+    Fault Tolerance

@@ -1,0 +1,29 @@
+jira(agile methodlogy)
+-------------------------------------------------------------
+
+jira-versions :-
+----------------
+>> jira software 
+>> jira align
+>> jira workmanagement
+>> jira service management
+
+>> jira software :-
+++ issue tracking
+
+>> jira align:-
+++ this is enterprise level
+++ customize the different process
+++ customize the process
+
+>> jira workmanagement
+++ non-development (ex: Hr's , finance team)
+
+>> jira service management
+++ service desk =>linux 
+
+>> marketplace.atlassian.com
+++ jira integration with git
+++ slack integration with jira
+++ jenkins integration with jira
+++ 

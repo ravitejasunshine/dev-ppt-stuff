@@ -1,0 +1,111 @@
+API Gateway:-
+-------------------------------------------------------------
+1-What is an API Gateway? | What is the API?
+
+>> what is an API?
+API is an acronym for Application programming interface which helps us to establish communication between two different applications.
+
+>> 3-tier Architecture
+presentation Layer
+Business Layer
+Data Layer
+
+# Data Layer
+data layer communicate with database.
+
+# presentation Layer
+collects the data from the UI -----> Business layer
+
+# Business layer
+Business logic will be written
+				|
+				|
+				|
+				^
+			Data Layer
+                  
+Insert() update()  select()  Delete()  				
+
+# Data Layer
+
+GETUniversities()     (#method name)
+
+SELECT * FROM Universtiestable where country='India'
+
+## API methods
+
+The four main HTTP methods (GET,PUT,POST,and DELETE) can be mapped to CRUD operations as follows:
+
+> GET retrieves the representation of the resource at a specified URI. GET should have no side effects on the server.
+
+> PUT updates a resource at a specified URI. PUT can also be used to create a new resource at a specified URI, if the server allows clients to specify new URIs. For this tutorial, the API will not support creation through PUT.
+
+> POST creates a new resource. The server assign the URI for the new object and returns this URI as part of the response message.
+
+> DELETE deletes a resource at a specified URI.
+
+### AWS API GATEWAY
+> The API gateway is a service provided by amazon web services which is ussed to create, publish, maintain and secure various APIs such as REST, HTTP and WebSocket at any scale.
+
+>> API GATEWAY FEATURES:-
++ supports stateful(Websocket) and stateless(HTTP and REST) APIs.
++ Highly secured authentication mechanism.
++ Cloudwatch logging support, which helps to monitor the API performance.
++ supports custom domain names.
++ Integration with AWS X-ray.
++ No upfornt fee or commitment required.
+
+------------------------------------------------------------
+2.API Gateway Part#2| Create your first API 
+
+>>> AWS API Gateway
+
+>> How to create a simple REST API?
+
+goto aws management console -> API Gateway -> Rest Api -> Build ->
+choose the protocol -> Rest
+create new api -> new api
+settings ->
+api name -> ccitapi
+description -> ccit api creation
+Endpoint type -> Regional
+create api
+
+create Resources -> goto actions -> create resources -> 
+Resource name -> ccitresource
+enable api gateway cors -> enable 
+create resource
+
+goto actions -> create method -> options -> GET 
+-------------------------------------
+goto AWS Lambda -> create function -> 
+function name -> ccitwelcome
+Runtime -> python 3.9
+Architecture -> x86_64
+create function
+
+goto code source -> 
+"body": json.dumps("Hello welcome to ccit")
+Deploy
+--------------------------------------
+GET - Setup
+Integration type -> Lambda Function
+Lambda Region -> ap-south-1
+Lambda Function -> ccitwelcome
+save
+
+goto ccitresource -> actions -> Deploy api ->
+Deployment stage -> new stage -> 
+stage name -> prod
+stage description -> optional
+Deployment description -> optional 
+Deploy
+
+# goto stages  -> prod -> ccitresource -> GET -> invoke ulr
+-> copy link and paste into browser.
+
+
+--------------------------end----------------------------
+
+
+

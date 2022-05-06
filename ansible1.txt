@@ -1,0 +1,2086 @@
+ansible
+-------------------------------------------------------------
+>> ansible is a configuration management tool.
+>> what does ansible?
+++ ansible inventory
+++ ansible playbook
+
+
+++ ansible engine contaians inventoty file.
+++ inventory have list of all remote hosts.
+++ ansible playbook 
+	> it is a yaml file.
+	> it will have sequence of plays.
+	> play is nothing but sequence of tasks.
+	> task is a action plan.
+	> action plans are running the modules. 
+
+structure of ansible engine:-
+-----------------------------
+
+|--------------|--------------> manage-node1
+| ansible      |--------------> manage-node2
+|	engine     |--------------> manage-node3
+|--------------|--------------> manage-node4
+ control node
+
+### why ansible is came up?
+	++ everything is using scripts.
+
+----------------------------------------------------------
+>>>> ansible installation
+
+control engine
+-----------|-------------------> node1
+master-node|
+-----------|-------------------> node2
+
+++ goto aws ec2 instances , launch 3 ec2 instances.
+++ one is master and node1 ,node2
+++ master is Redhat linux
+++ node1&2 is ami linux
+
+goto google search -> ansible installation
+
+### ansible-master(red hat):-
+>> install epel
+>> yum install ansible
+>> ansible --version
+>> python3 --version
+>> cat /etc/redhat-release
+>> ansible --version
+>> cd /etc/ansible
+>> ls -lrt
+
+## create a user
+>> useradd ansibleuser
+>> passwd ansibleuser
+
+## give the sudo permissions
+>> visudo
+ansibleuser   ALL=(ALL)   NOPASSWD: ALL
+>> su - ansibleuser
+>> exit
+>> cd /etc/ssh
+>> vi sshd_config
+PasswordAuthentication yes
+#PasswordAuthentication no
+
+### ansible-node-1
+>> useradd ansibleuser
+>> passwd ansibleuser 
+>> vi /etc/ssh/sshd_config
+PasswordAuthentication yes
+#PasswordAuthentication no
+>> visudo
+%wheel ALL=(ALL)   ALL
+ansibleuser  ALL=(ALL)   ALL
+>> 
+
+
+### ansible-node-2
+>> useradd ansibleuser
+>> passwd ansibleuser 
+>> vi /etc/ssh/sshd_config
+PasswordAuthentication yes
+#PasswordAuthentication no
+>> visudo
+%wheel ALL=(ALL)   ALL
+ansibleuser  ALL=(ALL)   ALL
+>> 
+
+### ansible-master
+>> sudo su - ansibleuser
+>> ls -la  (# all hidden files and floders)
+>> ssh-keygen
+>> ls -la
+>> cd .ssh
+>> ls -lrt
+>> ssh-copy-id ansible-node1
+
+# ansible-master
+goto root terminal
+root >> systemctl restart sshd
+ 
+# ansible-node-1
+goto root terminal
+root >> systemctl restart sshd
+
+# ansible-node-2
+goto root terminal
+root >> systemctl restart sshd
+
+## ansible-master
+>> su - ansibleuser
+>> ssh-copy-id ansible-node1-ip
+>> ssh ansible-node1-ip
+successfully login to ansible-node1-ip 
+>> ssh-copy-id ansible-node2-ip
+>> ssh ansible-node2-ip
+>> ansible --version
+>> cd /etc/ansible
+>> ls -lrt
+note: here hostfile is nothing but inventoryfile.
+>> vi hosts
+not open because ask the sudo permissions
+>> sudo vi hosts
+ansible-node1-ip
+ansible-node2-ip
+>> 
+
+>> ansible all -m ping
+note: here [ping] is a module.
+
+>> sudo yum install tree -y
+>> tree ansible
+
+## inventory file location
+inventory = /etc/ansible/hosts
+
+>> cd ansible
+>> sudo vi ansible.cfg
+note: all configuration files setup here.
+---------------------------------------------------------
+>>> ansible is configuration management tool.
+ ++ it is configure the networks and tools.
+                    public or private cloud
+                      |
+ 	host          connection plugins ---> hosts[1,2,3]
+
+ 	inventory     |ansible|      plugins,email,logging
+
+ 	playbooks      core modules   custom modules
+
+### ansible is agentless architechure
+                    
+                    ssh
+---------------|----------------> node 1
+ansible master |
+               |    ssh
+---------------|----------------> node 2                   
+
+++ it is a open source automation tool.
+++ openssh
+++ agentless
+++ python/yaml based
+++ flexible
+++ system defined modules
+++ custom modules
+
+>> what is current state and desired state.
+>> ansible diagram
+>> ansible usecases
+	++ configuration management
+	++ application deployment
+	++ security
+	++ orchestration
+	++ provisioning
+	++ continuous delivery with ansible
+	++ how ansible works?
+https://kodekloud.com/what-is-ansible-in-devops-and-how-it-works/
+
+ansible
+++ modules (library files)
+++ cnditions
+++ actual commands
+
+desired state -> playbooks
+current state -> host
+
+playbooks->plays -> task1 -> modules -> task2 -> modules -> task3 -> modules.
+
+control node----> managed node(windows)--> powershell(v.30)
+   |         ----> managed node(linux)--> python3.5 later
+   |
+linux(python)
+
+		### how to deploy ansible
+>>what is inventory
+++ it is a list of managed hosts(remote servers).
+++ inventory two types 
+    + static inventory
+       + it is like text,yaml,ini format
+       + default location of static inventory
+         /etc/ansible/hosts
+
+    + dynamic inventory
+
+>> ansible --version
+>> vi /etc/ansible/hosts
+[linuxservers]
+servera
+serverb
+
+[web]
+serverc
+
+[db]
+servera
+serverb
+
+>> cat /etc/ansible/hosts
+>> vi /etc/ansible/hosts (# 100 servers launching)
+[linuxservers]
+server[a:d]
+
+[web]
+192.168.250[1:100]
+
+[db]
+192.168.252:[1:10]
+
+[India:children]
+web
+db
+
+[singapore:children]
+linuxservers
+
+>> ansible --list-hosts linuxservers
+>> ansible --list-hosts web
+>> ansible --list-hosts db
+>> ansible --list-hosts all
+>> ansible --list-hosts India
+>> ansible --list-hosts ungrouped
+
+>> vi /etc/ansible/hosts (# 100 servers launching)
+servere     (ungrouped)
+serverf  	(ungrouped)
+[linuxservers]
+server[a:d]
+
+[web]
+192.168.250[1:100]
+
+[db]
+192.168.252:[1:10]
+
+[India:children]
+web
+db
+
+[singapore:children]
+linuxservers
+ 
+>> ansible --list-hosts ungrouped
+>> ansible --list-hosts all
+>> ansible-inventory --graph
+
+>> mkdir ansibledev
+>> cd ansibledev 
+>> vi inventory
+servera
+
+[web]
+server[b:c]
+172.25.150.[1:5]
+
+[db]
+server[c:d]
+
+[India_dc:children]
+web
+db
+
+>> ansible-inventory --graph
+>> ansible-inventory --graph -i inventory
+>> 
+
+		### ansible configuration files
+# ansible config file is -> ansible.cfg
+# ansible.cfg file has two sections 
+ 1) defaults 2) privilege_escalation
+>> ansible --version
+config file = /etc/ansible/ansible.cfg
+>> cd /etc/ansible/
+>> vi ansible.cfg
+
+Default ansible configurationfile->/etc/ansible/ansible.cfg
+
+non-root we can't access the configuration file.
+
+root user can create file ansible.cfg  
+>> vi ~/.ansible.cfg
+[defaults]
+inventory = ./inventory
+
+>> ansible --version
+
+my project name is -> ansibledev
+i will create a file called ansible.cfg inside ansibledev.
+
+>> mkdir ansibledev
+>> cd ansibledev
+>> vi ansible.cfg
+[defaults]
+>> ansible --version
+
+	ansible configuration file
+
+>> /etc/ansible/ansible.cfg-> default location(a=12,b=105,c=108)	
+>> ~/ ansible.cfg-> ansible-user location (b=102)
+>> current-proj-dir/ansible.cfg-> project location (a=10)
+
+first prority a= 10
+              b= 102
+              c= 108
+
+>>export ANSIBLE_CONFIG= <config-path>
+note: it's overrite all locations 
+
+>> touch /tmp/ansible.cfg
+>> export ANSIBLE_CONFIG=/tmp/ansible.cfg
+>> ansible --version
+
+#remove the file
+>> rm -rf /tmp/ansible.cfg
+>> ansible --version
+
+## set the inventory file
+>> vi ttt2/ansible.cfg
+[defaults]
+inventory =inventory
+remote_user = ansible
+host_key_checking = false
+deprecation_warning = false
+
+[privilege_escalation]
+become = True
+become_method = sudo
+become_user = root
+become_ask_pass = False
+
+                      ssh-keygen  -------------
+       ------------|------------->|manage node| python
+	   |controller |              -------------
+	   |  node     |  ssh-keygen  -------------
+       |-----------|------------->|manage node| python 
+         ansible,                 -------------
+         python
+
+++ password-less authentication
+++ ssh-keygen  
+++ create ansibleuser
+
+## ansible help commands
+>> ansible-doc -l
+it will list all modules to display.
+>> ansible-doc -l | wc -l 
+
+# only visit ansible modules
+>> ansible-doc -l | grep ^win_
+>> ansible-doc -l | grep ^ios_
+>> ansible-doc -l | grep ^aws_
+>> ansible-doc aws_s3
+>> ansible-doc group
+>> 
+
+## versions of modules
+++ stable
+++ preview
+++ deprecated
+++ removed
+
+>> ansible-doc group
+
+
+### discussion with
+   >> AD-hoc commands
+   >> modules
+   >> playbooks
+   >> variables & facts
+
+>> AD-hoc commands
+exampels
+ ++ ansible hosts -m module [-a arguments] [-i inventory]
+ ++ ansible all -m user -a "name=ttt"
+
+## goto ansible-control or ansible master
+>> ansible all -m user -a "name=India"
+>> ansible all -m user -a "name=India"
+# login to ansible-node1
+>> ssh <ansible-node1-ip>
+>> cd /home/
+>> ls
+>> exit
+goto every node i can't check
+>> ansible all -m command -a "id India"
+#note: command is a module 
+>> ansible all -m command -a "id India1"
+#no such a usernon-zero return code
+>> ansible all -m ping
+>> ansible-doc
+#check the modules
+>> ansible-doc ping
+
+### what is modules in ansible
+>> specific task we are runing through modules. 
+
+	modules ---> task
+>> ansible-doc -l
+it will list all modules.
+
+
+### goto ansible-controller
+>> cd Ansible/Project/adhoc
+>> ls -lrt
+>> ansible all -m user -a 'name=India state=absent'
+>> ansible all -m command -a "id India"
+>> ansible-doc user
+note:  search [user] module.
+
+### run the ansible modules
+# ansible-controller
+>> ansible all -m ping
+>> vi inventory
+ansiblenode1
+ansiblenode2
+>> ansible all -m ping
+
+++ start the sshd service
+>> ansible all -m service -a "name=sshd state=started"
+
+++ command module
+>> ansible all -m command -a "/sbin/reboot -t now"
+>> ansible all -m ping
+
+++ copy module
+>> ansible ansiblenode1 -m copy -a 'content="Hello floks" dest=/etc/hello'
+>> check copied or not
+>> ansible ansiblenode1 -m shell -a 'cat /etc/hello'
+>> ansible all -m ping
+
+++ raw module
+>> ansible -u root -i inventory ansiblenode2 --ask-pass -m raw -a 'yum install python3 -y'
+
+note: 
+#adhoc commands are running one or few tasks.
+# ad-hoc commands are convenient for testing.
+
+### ansible playbooks
+++ yaml
+  ++ yaml syntax
+  ++ multiple playbooks
+>> how to write playbooks using yaml
+yaml starts with ---
+
+--- [#start]                 #play1
+- name:                     #first play have 2 tasks
+  [#give the arguments]
+  tasks:
+  - name:
+  	module:
+  	arg1:
+  	arg2:
+  - name:
+  	module
+  	arg1:
+  	arg2:	
+- name:               #play2   #second play have 2 tasks
+  [#give the arguments]
+  tasks:
+  - name:
+  	module:
+  	arg1:
+  	arg2:
+  - name:
+  	module
+  	arg1:
+  	arg2:	
+--- [#end]
+
+note: identation required
+     2 spaces 
+
+### write playbooks
+# goto ansible-controller
+>> vi vsftpd.yaml
+---
+- name: deploy vsftpd    # myplayname
+  hosts: ansiblenode1
+  tasks:
+  - name: install vsftpd
+    yum: name=vsftpd      # yum=module
+  - name: enable vsftpd
+    service: name=vsftpd enabled=true
+  - name: create readme file
+    copy:
+      content: "Hello floks type yaml files instead of copying"
+      dest: /var/ftp/pub/README
+      force: no
+      mode: 0444
+---
+>> ansible-playbook vsftpd.yaml
+
+### how will we check the ansible syntax
+syntax:-
+	ansible-playbook --syntax-check vsftpd.yaml
+	ansible-playbook -v vsftpd.yaml  (#task results)
+	ansible-playbook -vv vsftpd.yaml (# configu results)
+	ansible-playbook -vvv vsftpd.yaml (# information about connections to managed hosts)
+	ansible-playbook -vvvv vsftpd.yaml (# information about plugins)
+
+		-C option to dryrun
+>> ansible-playbook --syntax-check vsftpd.yaml
+>> ansible-playbook -v vsftpd.yaml
+>> ansible-playbook -vv vsftpd.yaml
+>> ansible-playbook -vvv vsftpd.yaml
+>> ansible-playbook -vvvv vsftpd.yaml
+>> ansible-playbook -C vsftpd.yaml
+
+### how to write playbook inside multiple plays and multiple tasks.
+>> cd Ansible/Project/adhoc/
+>> vi webserver.yaml
+---
+- name: enable webserver       #firstplay
+  hosts: ansiblenode1          # ansible-node
+  tasks:
+    - name: install and firewalld
+      yum:                         # yum module
+        name:
+          - httpd
+          - firewalld
+        state: latest
+    - name: install welcome page
+      copy:                      # copy module
+        content: hello world
+        dest: /var/www/html/index.html
+    - name: start web services
+      service:                   # service module
+        name: httpd
+        enabled: true
+        state: started
+    - name: start firewalld services
+      service:
+        name: firewalld
+        enabled: true
+        state: started
+    - name: open firewalld
+      firewalld:              # firewalld arguments
+        service: http
+        permanent: true
+        state: enabled
+        immediate: yes
+- name: test webserver access
+  hosts: localhost
+  become: no
+  tasks:
+    - name: connect to the web server
+      uri:
+        url: http://ansiblenode1
+        return_content: yes
+        status_code: 200
+---
+
+>> ansible-playbook --syntax-check webserver.yml
+>> ansible-playbook -v webserver.yml
+note: enable http server in aws instance
+>> curl http://ansiblenode1
+
+task: using ansible to uninstall the httpd server.
+
+
+		### ansible variables
+## how we are using ansible variables.
+## how to define variables.
+
+## ansible-control
+>> mkdir variables
+>> cd variables
+>> vi user.yml
+---
+- name: create a user using a variable
+  hosts: all
+  vars:
+    user: devuser
+  tasks:
+    - name: create a user {{ user }}
+      user:
+        name: "{{ user }}"
+
+>> vi inventory
+ansiblenode1
+
+[lamp]
+ansiblenode1
+
+[file]
+ansiblenode1
+
+[nodes:children]
+lamp
+file
+
+>> ansible-playbook user.yml
+
+# check the user is created or not.
+>> ansible all -m shell -a "grep devuser /etc/passwd"
+
+## variable precedence
+	++ global scope
+		>> we're setting into the inventory or through command line.
+	++ play scope
+	    >> applied to play
+	++ host scope
+	    >> we're use in inclusion file
+>> ansible-playbook user.yml -e "user=India"
+note: it's overwrite the previous user.
+
+## how to manage host variables
+	++ variables can be assigned to hosts.
+	++ variables can be assigned to groups of hosts.
+
+## ansible controller
+>> mkdir webservers
+>> cd webservers
+site.yml inventory ansible.cfg group_vars
+>> tree 
+|--- ansible.cfg
+|--- group_vars
+|      |----lamp
+|--- inventory
+|--- site.yml
+
+>> vi inventory
+ansiblenode1
+
+[lamp]
+ansiblenode1
+
+[file]
+ansiblenode1
+
+[nodes:children]
+lamp
+file
+
+>> vi ansible.cfg
+[defaults]
+inventory = inventory
+remote_user = ansiblenode1
+host_key_checking = false
+
+[privilege_escalation]
+become = True
+become_method = sudo
+become_user = root
+become_ask_pass = False
+
+>> vi site.yml
+---
+- name: configure web services
+  hosts: lamp
+  tasks:
+    - name: this is the {{ web_package }} package
+      debug:
+        msg: "Installing {{ web_package }}"
+    - name: this is the {{ web_service }} service
+      debug:
+        msg: "Starting {{ web_service }}"
+
+>> cd group_vars
+>> ls
+>> vi lamp
+web_package: httpd
+web_service: httpd
+>> pwd
+>> cd ..
+>> ls
+>> ansible-playbook site.yml
+>> ansible-playbook site.yml -e "web_package=sshd"
+>> ansible-playbook site.yml -e "web_package=sshd" -e "web_service=sshd"
+
+## multi-valued variables
+	++ we can use arrays or dictionaries
+	++ arrays = lists
+	++ dictonaries = hash
+
+## ansible-controller
+>> mkdir vars
+>> cd vars
+>> ll
+users users-dictionary users-list
+>> vi users-list
+users:
+  - username: linda
+    homedir: /home/linda
+    shell: /bin/bash
+  - username: lisa
+    homedir: /home/lisa
+    shell: /bin/bash
+  - username: anna
+    homedir: /home/anna
+    shell: /bin/bash
+>> cat users-list
+>> vi users-dictionary
+users:
+  linda:
+    username: linda
+    homedir: /home/linda
+    shell: /bin/bash
+  lisa:
+    username: lisa
+    homedir: /home/lisa
+    shell: /bin/bash
+  anna:
+    username: anna
+    homedir: /home/anna
+    shell: /bin/bash
+>> cat users-dictionary
+>> cd ..
+>> ls
+>> mkdir arrays
+>> cd arrays
+>> vi multi-list.yml
+---
+- name: show lists also known as arrays
+  hosts: ansiblenode1
+  vars_files:
+    - vars/users-list
+  tasks:
+    - name: print array values
+      debug:
+        msg: "User {{ item.username }} has homedirectory {{ item.homedir}} and shell {{ item.shell }}"
+      loop: "{{ users }}"
+    - name: print the second array value
+      debug: 
+        msg: the second item is {{ users[1] }}
+>> vi inventory
+ansiblenode1
+
+>> vi ansible.cfg
+[defaults]
+inventory = inventory
+remote_user = ansibleuser
+host_key_checking = false
+
+[privilege_escalation]
+become = True
+become_method = sudo
+become_user = root
+become_ask_pass = Flase
+
+>> ansible-playbook multi-list.yml
+>> vi multi-dictory.yml
+---
+- name: show dictionary also known as hash
+  hosts: ansiblenode1
+  vars_files:
+    - vars/users-dictionary
+  tasks:
+    - name: print dictionary values
+      debug:
+        msg: "User {{ users.linda.username}} has homedirectory {{ users.linda.homedir }} and shell {{ users.linda.shell }}"
+
+>> ansible-playbook multi-dictionary.yml
+
+## how you manage secrets in ansible.
+	++ using vault to manage secrets.
+	++ sensitive data should be pass secure way.
+	++ for examples :- webkeys, passwords,keys.
+	++ ansible vault using to pass the secure way.
+	++ ansible vault is using to encrypt and decrypt all the files.
+
+syntax:-
+	>> ansible-vault create playbook.yml
+note: it's create encrypted file.
+    >> ansible-vault view playbook.yml
+    >> ansible-vault edit playbook.yml
+    >> ansible-vault rekey
+note: create a new key of existing file.
+
+## ansible-controller
+>> mkdir vault
+>> cd vault
+>> ll
+ansible.cfg create-user.yml inventory secret.yml vault-pass
+>> vi create-user.yml
+---
+- name: create a user
+  hosts: all
+  vars_files:
+    - secret.yml
+  tasks:
+    - name: creating user
+      user:
+        name: "{{ username }}"
+        password: "{{ pwhash }}" 
+
+>> cat create-user.yml
+>> ansible-vault create secret.yml
+username: hello-user
+pwhash: password
+>> cat secret.yml
+>> cat create-user.yml
+>> ansible-playbook --ask-vault-pass create-user.yml
+>> echo redhat > vault.pass1
+>> cat vault.pass1
+>> ls -l
+>> chmod 400 vault.pass1 (#only read access)
+>> ls -lrt
+>> ansible-playbook --vault-password-file=vault.pass1 create-user.yml
+
+# change the password
+>> ansible-vault rekey secret.yml
+>> vi vault.pass
+[# update the password ]
+>> ansible-playbook --vault-password-file=vault.pass1 create-user.yml
+>> ansible-vault decrypt secret.yml  (#decrypt)
+>> ansible-vault encrypt secret.yml  (#encrypt)             
+
+note: ansible-vault can be manage your secrets.
+
+
+### ansible facts
+	++ ansible facts nothing but variables.
+	++ setup module is using to run adhoc commands.
+# setup module
+	++ ansible -m setup all
+
+## ansible controller
+>> mkdir facts
+>> cd facts
+>> ansible -m setup all
+>> ll
+ansible.cfg
+facts.retry
+facts.yml
+inventory
+ipfact.retry
+ipfact.yml
+localfactcheck.yml
+localfacts.fact
+localfacts.yml
+newlocalfacts.yml
+>> vi facts.yml
+---
+- name: show facts
+  hosts: all
+  tasks:
+    - name: print facts
+      debug:
+        var: ansible_facts
+>> vi inventory
+ansiblenode1
+>> vi ansible.cfg
+[defaults]
+inventory = inventory
+remote_user = ansibleuser
+host_key_checking = false
+deprecating_warning = false
+
+[privilege_escalation]
+become = True
+become_method = sudo
+become_user = root
+become_ask_pass = False
+
+>> ansible-playbook facts.yml
+
+
+### loops and conditional tasks:-
+>> mkdir taskcontrol
+>> cd taskcontrol
+>> vi loopusers.yml
+---
+- name: create users using a loop
+  hosts: all
+  tasks:
+  - name: create users
+    user:                           #user is module
+      name: "{{ item.name }}"       # check for the loop
+      state: present
+      groups: "{{ item.groups }}"
+    loop:
+      - name: anna
+        groups: wheel
+      - name: linda
+        groups: users
+      - name: bob
+        groups: users
+
+>> ansible-playbook loopusers.yml
+>> vi ansible.cfg
+[defaults]
+inventory = inventory
+remote_user = ansibleuser
+host_key_checking = false
+deprecating_warning = false
+
+[privilege_escalation]
+become = True
+become_method = sudo
+become_user = root
+become_ask_pass = False
+
+>> vi inventory
+ansiblenode1
+
+[lamp_test]
+ansiblenode1
+
+[lamp_prod]
+ansiblenode1
+
+[nodes:children]
+lamp_prod
+
+### how to use register variables with loops
+>> cd taskcontrol
+>> vi register_loop.yml
+---
+- name: demo how register works
+  hosts: all
+  tasks:
+  - name: show loop register
+    shell: "echo {{ item }}"
+    loop:
+      - "one"
+      - "two"
+    register: echo
+  - name: show register results
+    debug:
+      var: echo
+>> ansible-playbook register_loop.yml
+>> vi register_command.yml
+---
+- name: test register
+  hosts: ansiblenode1
+  tasks:
+    - shell: cat /etc/passwd
+      register: passwd_contents
+    - debug:
+        msg: echo "passwd contains user lisa"
+      when: passwd_contents.stdout.find('lisa') != -1
+      
+
+>> vi register_homes.yml
+--- 
+- name: registered variable usage as a loop list
+  hosts: localhost
+  tasks:
+    - name: create target directory
+      file:
+        path: /mnt/bkspool
+        state: directory
+    - name: retrieve the list of home directories
+      command: ls /home
+      register: home_dirs
+    - name: add home dirs to the backup spooler
+      file:
+        path: /mnt/bkspool/{{ item }} 
+        src: /home/{{ item }}
+        state: link
+      loop: "{{ home_dirs.stdout_lines }}"                 
+
+>> ansible-playbook register_homes.yml
+>> useradd variabletest
+>> ansible-playbook register_homes.yml
+>> ls /home
+>> cd /mnt/bkspool/
+>> ls -lrt
+
+### how to use when statement
+	++ tasks run conditionally
+>> cd taskcontrol
+>> vi distro.yml
+---
+- name: when demo
+  hosts: all
+  vars:
+    supported_distros:
+      - Ubuntu
+      - Centos
+      - Fedora
+  tasks:
+    - name: install RH family specific packages
+      yum:
+        name: nginx
+        state: present
+      when: ansible_distribution in supported_distros
+
+>>  ansible-playbook distro.yml
+>> rpm -qa | grep -i nginx
+>> 
+
+### how to test multiple conditions
+>> cd taskcontrol
+>> vi when_multiple.yml
+---
+- name: using multiple conditions
+  hosts: all
+  tasks:
+  - package:
+      name: httpd
+      state: installed
+    when:
+      - ansible_distribution == "RedHat"
+#     - ansible_memfree_mb > 1512
+
+>> ansible-playbook when_multiple.yml
+>> vi restart.yml
+---
+- name: restart sshd only if crond is running
+  hosts: all
+  tasks:
+    - name: get the crond server status
+      command: /usr/bin/systemctl is-active crond
+      ignore_errors: yes
+      register: result
+    - name: restart sshd based on crond status
+      service:
+        name: sshd
+        state: restarted
+      when: result.rc == 0
+>> ansible-playbook restart.yml
+>> ansible-playbook -v restart.yml
+>> service crond stop
+note: (practice purpose)stop the crond service in localhost
+>> ansible-playbook -v restart.yml
+>> vi when_multiple_complex.yml
+---
+- name: using multiple conditions
+  hosts: all
+  tasks:
+  - package:
+      name: httpd
+      state: removed
+    when: >
+      ( ansible_distribution == "RedHat" and)
+        ansible_memfree_mb > 512 )
+      or
+      ( ansible_distribution == "CentOS" and)
+        ansible_memfree_mb > 1024 )
+
+### what are handlers
+	++ it allow you to configure playbooks.
+	++ restart of services and reboot of services for using handlers.
+    ++ one task may trigger more than one handler.
+
+>> cd taskcontrol    
+>> vi handlers.yml
+---
+- name: set up web server
+  hosts: all
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: latest
+    - name: copy index.html
+      copy:
+        src: /tmp/index.html
+        dest: /var/www/html/index.html
+      notify:
+        - restart_web
+    - name: copy nothing - intended to fail
+      copy:
+        src: /tmp/nothing
+        dest: /var/www/html/nothing.html
+  handlers:
+    - name: restart_web
+      service:
+        name: httpd
+        state: restarted
+
+>> ansible-playbook handlers.yml
+>> vi handlers.yml
+---
+- name: set up web server
+  hosts: all
+  force_handlers: True
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: latest
+    - name: copy index.html
+      copy:
+        src: /tmp/index.html
+        dest: /var/www/html/index.html
+      notify:
+        - restart_web
+    - name: copy nothing - intended to fail
+      copy:
+        src: /tmp/nothing
+        dest: /var/www/html/nothing.html
+  handlers:
+    - name: restart_web
+      service:
+        name: httpd
+        state: restarted
+>> ansible-playbook handlers.yml
+>> touch /tmp/index.html
+>> ansible-playbook handlers.yml
+>> ansible all -m file -a "path=/var/www/html/index.html state=absent"
+>> ansible-playbook handlers.yml
+>> ansible all -m file -a "path=/var/www/html/index.html state=absent"
+>> vi handlers.yml
+---
+- name: set up web server
+  hosts: all
+# force_handlers: True
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: latest
+    - name: copy index.html
+      copy:
+        src: /tmp/index.html
+        dest: /var/www/html/index.html
+      notify:
+        - restart_web
+    - name: copy nothing - intended to fail
+      copy:
+        src: /tmp/nothing
+        dest: /var/www/html/nothing.html
+  handlers:
+    - name: restart_web
+      service:
+        name: httpd
+        state: restarted
+>> ansible-playbook handlers.yml
+>> touch /tmp/nothing
+>> ansible-playbook handlers.yml
+>> ansible all -m file -a "path=/var/www/html/index.html state=absent"
+>> vi handlers.yml
+---
+- name: set up web server
+  hosts: all
+  force_handlers: True
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: latest
+    - name: copy index.html
+      copy:
+        src: /tmp/index.html
+        dest: /var/www/html/index.html
+      notify:
+        - restart_web
+    - name: copy nothing - intended to fail
+      copy:
+        src: /tmp/nothing
+        dest: /var/www/html/nothing.html
+  handlers:
+    - name: restart_web
+      service:
+        name: httpd
+        state: restarted
+
+>> ansible-playbook handlers.yml
+>> ansible all -m file -a "path=/var/www/html/index.html state=absent" 
+>> ansible all -m file -a "path=/var/www/html/nothing.html state=absent" 
+>> vi handlers.yml
+---
+- name: set up web server
+  hosts: all
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: latest
+    - name: copy index.html
+      copy:
+        src: /tmp/index.html
+        dest: /var/www/html/index.html
+      notify:
+        - restart_web
+    - name: copy nothing - intended to fail
+      copy:
+        src: /tmp/nothing
+        dest: /var/www/html/nothing.html
+  handlers:
+    - name: restart_web
+      service:
+        name: httpd
+        state: restarted
+
+>> ansible-playbook handlers.yml
+>> ansible all -m file -a "path=/var/www/html/index.html state=absent" 
+>> ansible all -m file -a "path=/var/www/html/nothing.html state=absent" 
+
+		### Blocks
+++ blocks is superset of tasks.
+++ block is nothing but logicset of tasks.
+++ error handling 
+## cd taskcontrol
+>> vi blocks.yml
+---
+- name: simple block example
+  hosts: all
+  tasks: 
+    - name: setting up http
+      block:
+      - name: installing http
+        yum:
+          name: http
+          state: present
+      - name: restart httpd
+        service:
+          name: httpd
+          state: started
+      when: ansible_distribution == "Redhat"
+
+>> ansible-playbook blocks.yml
+>> vi blocks.yml
+---
+- name: simple block example
+  hosts: all
+  tasks: 
+    - name: setting up http
+      block:
+      - name: installing http
+        yum:
+          name: http
+          state: present
+      - name: restart httpd
+        service:
+          name: httpd
+          state: started
+      when: ansible_distribution == "Ubuntu"
+
+>> ansible-playbook blocks.yml
+>> ansible-playbook -v blocks.yml
+>> ansible-playbook -vv blocks.yml
+>> vi blocks.yml
+---
+- name: simple block example
+  hosts: all
+  tasks: 
+    - name: setting up http
+      block:
+      - name: installing http
+        yum:
+          name: http
+          state: present
+      - name: restart httpd
+        service:
+          name: httpd
+          state: started
+      when: ansible_distribution == "RedHat"
+>> ansible-playbook blocks.yml
+>> vi blocks2.yml
+---
+- name: using blocks
+  hosts: all
+  tasks:
+    - name: intended to be successful
+      block:
+        - name: remove a file
+          shell:
+            cmd: /usr/bin/rm /var/www/html/index.html
+      rescue:
+        - name: create a file
+          shell:
+            cmd: /usr/bin/touch /tmp/rescuefile
+      always:
+        - name: always write a message to logs
+          shell: 
+            cmd: /usr/bin/logger hello
+
+>> ansible-playbook blocks2.yml
+>> touch /var/www/html/index.html
+>> ansible-playbook blocks2.yml
+>> vi blocks2.yml
+---
+- name: using blocks
+  hosts: all
+  tasks:
+    - name: intended to be successful
+      block:
+        - name: remove a file
+          file:
+            cmd: /usr/bin/rm /var/www/html/index.html
+      rescue:
+        - name: create a file
+          shell:
+            cmd: /usr/bin/touch /tmp/rescuefile
+      always:
+        - name: always write a message to logs
+          shell: 
+            cmd: /usr/bin/logger hello
+>> ansible-playbook blocks2.yml
+>> cd taskcontrol
+>> vi failure.yml
+---
+- name: demonstrating failed_when
+  hosts: all
+  tasks:
+    - name: run a script
+      command: echo hello world
+      ignore_errors: yes
+      register: command_result
+      failed_when: "'world' in command_result.stdout"
+    - name: see if we get here
+      debug:
+        msg: hello
+
+>> ansible-playbook failure.yml
+>> vi failure2.yml
+---
+- name: show the fail module
+  hosts: all
+  tasks:
+  - name: do something impossible
+    lvol:                          #logical volume
+      lv: lvnothing
+      vg: vgnothing
+      size: 1G
+    register: command_result      #it's a variable&store to command_result
+    ignore_errores: yes
+  - name: show command_result errors
+    debug:
+      var: command_result
+  - name: print nice error message after failure
+    fail:
+      msg: volume group doesnt exist
+    when: "'Failed' in command_result.msg"
+    
+>> ansible-playbook failure2.yml
+
+
+### Deploy files and manipulating files and jinja2 templates.
+# how to work with files in ansible?
+# File modules?
+# what are the types of file modules?
+
+++ lineinfile is used to change the singlefile.
+++ blockinfile is used to manipulate multiline blocks.
+++ copy : it will used to local to remote machine.
+++ fetch:fetch from remote machine and store from managed node.
+++ file: create and manage files.
+
+## ansible controller
+>> mkdir jinja
+>> cd jinja
+>> vi file.yml
+---
+- name: create a file
+  hosts: all
+  tasks:
+    - name: create a file
+      file:
+        path: /tmp/removeme
+        owner: ansibleuser
+        mode: 0640
+        state: touch
+        setype: public_content_rw_t
+
+>> ansible-doc file
+>> ansible-playbook file.yml
+>> vi copy.yml
+---
+- name: file copy modules
+  hosts: all
+  tasks:
+  - name: copy file demo
+    copy: 
+      src: /etc/hosts
+      dest: /tmp/
+  - name: add some lines to /tmp/hosts
+    blockinfile:
+      path: /tmp/hosts
+      block: |
+        192.168.4.110 host1.example.com
+        192.168.4.120 host2.example.com
+      state: present
+  - name: verify file checksum
+    stat:
+      path: /tmp/hosts
+      checksum_algorithm: md5
+    register: result             #variable
+  - debug:
+      msg: "The checksum of /tmp/hosts is {{ result.stat.checksum }}"
+  - name: fetch a file
+    fetch:
+      src: /tmp/hosts            # managed node
+      dest: /tmp/                # ansiblecontroller
+
+>> ansible-playbook copy.yml
+>> ansible-doc stat
+>> cd /tmp/ansiblenode1/
+>> ls
+>> cd /tmp/
+>> ll
+>> vi hosts
+# BEGIN ANSIBLE MANAGED BLOCK
+192.168.4.110 host1.example.com
+192.168.4.120 host2.example.com          
+# END ANSIBLE MANAGED BLOCK
+>> cat hosts
+>> ansible-doc fetch
+>> tree ansiblenode1
+>> vi copy.yml
+
+## jinja2 template and se linux file context
+	++ advanced modifications for using jinja2 templates.
+# jinja2 elements:
+    ++ data
+    ++ variables
+    ++ expressions
+    ++ control structures
+>> target file is located in managed host
+
+## ansible controller
+>> mkdir jinja
+>> cd jinja
+>> vi vsftpd-template.yml
+---
+- name: configure VSFTPD using a template
+  hosts: all
+  vars:
+    anonymous_enable: yes
+    local_enable: yes
+    write_enable: yes
+    anon_upload_enable: yes
+  tasks:
+  - name: install vsftpd
+    yum:
+      name: install vsftpd
+  - name: use template to copy FTP config
+    template:
+      src: vsftpd.j2
+      dest: /etc/vsftpd/vsftpd.conf
+
+>> ansible-playbook vsftpd-template.yml
+>> ansible all -a "cat /etc/vsftpd/vsftpd.conf"
+>> mkdir template
+>> cd template
+>> vi vsftpd.j2
+anonymous_enable={{ anonymous_enable }} 
+local_enable={{ local_enable }}
+write_enable={{ write_enable }}
+anon_upload_enable={{ anon_upload_enable }}
+dirmessage_enable=YES
+xferlog_enable=YES
+connect_from_port_20=YES
+pam_service_name=vsftpd
+userlist_enable=YES
+#my IP address={{ ansible_facts['default_ipv4']['address'] }}          
+
+### control structures
+	++ for,if, iterate statements
+>> cd jinja
+>> vi hostsfile.yml
+---
+- name: update /etc/hosts file dynamically
+  hosts: all
+  tasks:
+    - name: update /etc/hosts
+      template:
+        src: template/hosts.j2
+        dest: /etc/hosts
+>> cd templates/
+>> ll
+hosts.j2 vsftpd.j2
+>> vi hosts.j2
+{% for hosts in groups['all'] %}
+{{ hostvars[host]['ansible_facts']['default_ipv4']['address']}} {{ hostvars[host]['ansible_facts']['fqdn'] }} {{ hostvars[host]['ansible_facts']['hostname'] }}
+{% endfor %}
+>> this is control statement
+>> cd ..
+>> ansible-playbook hostsfile.yml
+>> ansible ansiblenode1 -m command -a "cat /etc/hosts"
+>> ansible ansiblenode1 -m command -a "rm /etc/hosts"       
+>> ansible ansiblenode1 -m command -a "cat /etc/hosts"
+>> ansible-playbook hostsfile.yml
+>> ansible ansiblenode1 -m command -a "cat /etc/hosts"
+
+		### ansible Roles
+>>  create your own project directory
+ex:- myproject /ansible.cfg
+                inventory-dev
+                inventory-prod
+                site.yml
+                file.yml
+                lamp.yaml
+                group_vars/lamp
+                          /file
+                host_vars
+ ++ roles use for reusability
+ # playbook best-practices
+https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html
+
+# ansible roles
+ansible.galaxy.com
+
+>> ansible roles
+  ++ it is a collection of tasks,variables,files,templates.
+  ++ 
+# goto google ansible galaxy roles
+
+##install and download roles
+>> mkdir rolesdir
+>> cd rolesdir
+>> ansible-galaxy install geerlingguy.nginx
+>> ansible-galaxy search wordpress
+>> ansible-galaxy search wordpress --platforms EL
+>> ansible-galaxy info bertvv.wordpress
+>> ansible-galaxy install bertvv.wordpress   
+>> ansible-galaxy list
+>> ansible-galaxy remove geerlingguy.nginx
+
+# initialize the role
+>> ansible-galaxy init ttt.elearning
+>> cd rolesdir
+>> mkdir rolesone/
+>> cd rolesone
+>> vi requirements.yml
+---
+# from Ansible Galaxy
+- src: geerlingguy.docker
+
+- src: geerlingguy.nginx
+  version: 2.7.0
+  name: nginx
+
+# from a tar ball:
+#- src: file:///opt/local/roles/myrole.tar
+#  name: myrole
+
+>> ansible-galaxy install -r rolesone/requirements.yml -p rolesone/
+
+>> ansible-galaxy list
+>> ansible-galaxy install -r rolesone/requirements.yml
+>> ansible-galaxy list
+
+
+### how to write custom roles
+>> cd rolesone
+>> ls
+>> cd ..
+>> cd rolesdir
+>> ls -lrt
+>> cd ttt.elearning
+>> tree
+|--- defaults
+|       |-----main.yml
+|--- files
+|--- handlers
+|       |-----main.yml
+|--- meta
+|       |-----main.yml
+|--- README.md
+|--- tasks
+|        |----main.yml
+|--- templates
+|--- tests 
+|     |----inventory
+|     |----test.yml
+|--- vars
+      |----main.yml
+
+>> cd rolesone
+>> cd motd
+>> ls -lrt
+templates README.md meta defaults tasks
+>> tree
+>> vi t
+tasks/     templates/
+>> vi tasks/main.yml
+---
+# tasks file for motd
+- name: copy motd file
+  template:
+    src: templates/motd.j2
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: 0444
+
+>> cd templates
+>> vi motd.j2
+Welcome to {{ ansible_hostname }}   #it's a ansible-fact
+
+This file was created on {{ ansible_date_time.date }}
+Go away if you have no business being here
+
+Contact {{ system_manager }} if anything is wrong # it's avariable.
+
+>> cd ..
+>> cd motd
+>> vi defaults/main.yml
+---
+# defaults file for motd
+system_manager: anna@example.com
+
+>> cd ..
+>> cd rolesdir
+>> vi motd-role.yml
+---
+- name: use motd role playbook
+  hosts: ansiblenode1
+  user: ansibleuser
+  become: true
+
+  roles:
+    - role: motd
+      system_manager: ttt@example.com
+
+>> ansible-playbook motd-role.yml
+>> ansible ansiblenode1 -m shell -a 'cat /etc/motd'
+>> vi ansible.cfg
+[defaults]
+inventory = inventory
+remote_user = ansibleuser
+host_key_checking = false
+
+[privilege_escalation]
+become = True
+become_method = sudo
+become_user = root
+become_ask_pass = False
+
+>> ansible ansiblenode1 -m shell -a 'cat /etc/motd'
+note: first runs in role and  after run playbook task.
+
+>> cd rolesdir
+>> vi pretasks.yml
+---
+- name: run a task before a role
+  hosts: all
+  pre_tasks:                 #it's a keyword
+    - name: update yum cache
+      yum:
+        update_cache: yes
+  roles:
+    - motd       
+
+>> ansible-playbook pretasks.yml
+>> vi pretasks.yml
+---
+- name: run a task before a role
+  hosts: all
+  pre_tasks:                 #it's a keyword
+    - name: update yum cache
+      yum:
+        update_cache: yes
+  roles:
+    - motd       
+>> ansible-playbook pretasks.yml
+
+----------------------------------------------------------
+
+	### sysadmins for ansible
+
+>> what is inventory?
+  ++ inventory inside hostnames, ips, servers etc...
+>> what is static inventory?
+>> what is dynamic inventory?
+  ++ it will discover ip's automatically
+
+>> ansible-inventory --list
+>> vi pascal.py
+#!/usr/bin/python3
+
+from subprocess import Popen,PIPE
+import sys
+
+try:
+     import json
+except ImportError:
+     import simplejson as json
+
+
+result = {}
+
+result['all'] = {}
+
+pipe = Popen(['getent', 'hosts'], stdout=PIPE, universal_newlines=True) 
+
+result['all']['hosts'] = []
+
+for line in pipe.stdout.readlines():
+    s = line.split()
+    result['all']['hosts']=result['all']['hosts']+s
+
+result['all']['vars'] = {}
+
+if len(sys.argv) == 2 and sys.argv[1] == '--list':
+    print(json.dumps(result))
+
+elif len(sys.argv) == 3 and sys.argv[1] == '--host':
+    print(json.dumps({}))
+
+else:
+    print("Requires an argument, please use --list or --host <host>") 
+
+>> ./pascal.py --list
+
+###
+>> vi includes.yml
+---
+- name: setup apache
+  hosts: all
+  tasks:
+    - name: setup apache task
+      import_tasks: install-and-setup.yml
+      vars:
+        package: httpd
+        service: httpd
+
+>> vi install-and-setup.yml
+---
+- name: install the {{ package }} package
+  yum:
+    name: "{{ package }}"
+    state: latest
+- name: start the {{ service }} service
+  service:
+    name: "{{ service }}"
+    enabled: true
+    state: started
+
+>> ansible-playbook includes.yml
+
+### ansible troubleshooting
+>> vi vsftpd.yml
+---
+- name: deploy vsftpd
+  hosts: ansible2.example.com
+  vars:
+    package: vsftpd
+  tasks:
+  - name: install vsftpd
+    yum: {{ package }}
+  - name: enable vsftpd
+    service: name=vsftpd enabled=true
+  - name: create readme file
+    copy:
+      content: "wat moet je hier\n"
+      dest: /var/ftp/pub/README
+      force: no
+      mode: 0444
+---
+>> vi ansible.cfg
+[defaults]
+inventory = inventory
+remote_user = ansibleuser
+host_key_checking = false
+deprecation_warning = false
+log_path = ttt11.log
+
+[privilege_escalation] 
+become = True
+become_method = sudo
+become_user = root
+become_ask_pass = False
+
+>> ansible-playbook vsftpd.yml
+>> vi ttt11.log
+>> vi vsftpd.yml
+---
+- name: deploy vsftpd
+  hosts: all
+  vars:
+    package: vsftpd
+  tasks:
+  - name: install vsftpd
+    yum: "{{ package }}"
+  - name: enable vsftpd
+    service: name=vsftpd enabled=true
+  - name: create readme file
+    copy:
+      content: "wat moet je hier\n"
+      dest: /var/ftp/pub/README
+      force: no
+      mode: 0444
+---
+>> ansible-playbook vsftpd.yml
+>> ansible-playbook --syntax-check vsftpd.yml
+note: check the syntax for playbook
+
+### debug mode
+>> ansible-doc debug
+>> vi debugme.yml
+---
+- name: show how debug works
+  hosts: all
+  vars: 
+    user: linda
+  tasks:
+  - name: show value of a fact
+    debug:
+      msg: this system has {{ ansible_facts['memfree_mb'] }} available ram
+  - name: FIXME show a custom variable
+    debug:
+      var: user
+      verbosity: 1
+
+>> ansible-playbook debugme.yml
+>> ansible-playbook -v debugme.yml
+>> here
+verbosity 1 = -v
+verbosity 2 = -vv
+verbosity 3 = -vvv
+verbosity 4 = -vvvv
+
+## using checkmode
+>> syntax:
+         ansible-playbook --check
+
+>> ansible-playbook --check vsftpd.yml
+
+### how to use modules for troubleshooting
+>> vi bashversion.yml
+---
+- name: use debug to check package facts
+  hosts: all
+  tasks:
+    - name: get information about packages
+      package_facts:
+        manager: auto
+    - name: list installed packages
+      debug:
+        var: ansible_facts.packages
+    - name: show Bash version
+      debug:
+        msg: "Version {{ ansible_facts.packages['bash'][0].version}}"         
+      when: "'bash' in ansible_facts.packages"
+
+>> ansible-playbook bashversion.yml
+>> vi assertstat.yml
+---
+- name: sample of stat and assert
+  hosts: all
+  tasks:
+  - name: stat a directory
+    stat:
+      path: /etc
+    register: sta
+  - name: assert that /etc is a directory
+  	assert:
+  	  that: sta.stat.isdir
+
+>> ansible-playbook assertstat.yml
+>> vi assertstat.yml
+---
+- name: sample of stat and assert
+  hosts: all
+  tasks:
+  - name: stat a directory
+    stat:
+      path: /etc/hosts
+    register: sta
+  - name: assert that /etc is a directory
+  	assert:
+  	  that: sta.stat.isdir
+
+>> ansible-playbook assertstat.yml
+note: assertion failed -> practice purpose.
+
+### how you do the connections on troubleshooting
+++ connection issues
+++ authentication issues
+	++ check the remote_user settings
+	++ conform the host-key setup
+	++ become & become_user
+	++ configure the sudo
+	++ testing purpose using adhoc commands
+>> ansible all -m ping 
+>> ansible all -m ping --become
+>> ansible -m command -a 'df'
+>> ansible -m command -a 'df -h'
+>> ansible -m command -a 'free -m'
+>> ansible -m command -a 'df -h | grep -i rootfs'
+note: pipe symbol not works in command
+>> ansible -m shell -a 'df -h | grep -i rootfs'
+
+### analising the playbooks
+ ++ -v = it will show the output data
+ ++ -vv = output data as well input data will display 	
+ ++ -vvv = it will add connection information
+ ++ -vvvv = it will display all additional information,instance information, who is running,etc..
+
+ ### ansible project
+ >> ansible using deploy kafka
+
+ project structure:- 07:30:00
+ -------------------
+
+ |---------| Roles
+ | ansible |
+ |         | ----------
+ -----------          |
+ playbooks            |
+                 -----------  -------------   ------------
+                 | zk1     |  |  zk2      |   | zk3       |
+                 |  k1     |  |  k2       |   | k3        |
+                 -----------  -------------   -------------
+
+note:
+zk1 = zookeeper1
+zk2 = zookeeper2
+zk3 = zookeeper3
+
+k1= kafka broker1
+k2= kafka broker2
+k3= kafka broker3
+
+I have 4 servers 
+  # ansible controller and 3 manager nodes.
+  # 
+
+>> i have launched 4 instances
+
+### ansible-controller
+>> sudo su -
+>> useradd ansibleuser
+>> passwd ansibleuser
+>> visudo
+ansibleuser  ALL=(ALL)  NOPASSWD: ALL
+>> vi /etc/ssh/sshd_config
+PasswordAuthentication yes
+#PasswordAuthentication no
+>> systemctl restart sshd
+>> take the 3 ec2 servers
+>> take the private-ips of ansible-nodes
+>> vi /etc/hosts
+172.31.8.130 ansiblenode1
+172.31.11.162 ansiblenode2
+172.31.1.204 ansiblenode3
+>> enable your security
+>> security -> securitygroups -> inbound rules -> edit inbound rules -> add rule ->
+custom icmp-ipv4  all  myip  
+save rules
+>> ping ansiblenode2
+>> exit
+
+## login to ansiblenode1
+>> sudo su -
+>> useradd ansibleuser
+>> passwd ansibleuser
+>> visudo
+ansibleuser ALL=(ALL)  NOPASSWD: ALL
+>> vi /etc/ssh/sshd_config
+PasswordAuthentication yes
+#PasswordAuthentication no
+>> systemctl restart sshd
+
+## login to ansiblenode2, ansiblenode3
+ansiblenode1 process in ansiblenode2, ansiblenode3
+
+### goto ansiblecontroller
+>> sudo su -
+>> ssh-keygen
+>> cd .ssh/
+>> ls -lrt
+>> ssh-copy-id ansibleuser@ansiblenode1
+>> ssh-copy-id ansibleuser@ansiblenode2
+>> ssh-copy-id ansibleuser@ansiblenode3
+>> ssh ansibleuser@ansiblenode1
+>> ssh ansibleuser@ansiblenode2
+>> ssh ansibleuser@ansiblenode3
+
+### install ansible on ansible controller
+>> install epel
+>> yum install ansible -y
+>> ansible --version
+>> vi inventory
+ansiblenode1
+ansiblenode2
+ansiblenode3
+>> cat inventory
+>> mkdir kafka-project
+>> cd kafka-project
+>> cp inventory kafka-project
+>> cd kafka-project
+>> vi ansible.cfg
+[dafaults]
+inventory = inventory
+remote_user = ansibleuser
+host_key_checking = false
+deprecation_warning = false
+
+[privilege_escalation]
+become = True
+become_method = sudo
+become_user = root
+become_ask_pass = False
+
+>> ansible all -m ping
+>> 
+>>>> https://cloudnweb.dev/2019/04/ansible-password-less-ssh-playbook/
+>> https://galaxy.ansible.com/home
+>> search -> kafka standalone
+>> search -> confluent_kafka
+
+>> ansible-galaxy install macunha1.confluent_kafka
+>> cp -r /root/.ansible/roles/macunha1.confluent_kafka/ .
+>> ls -lrt
+>> cd macunha1.confluent_kafka
+>> ls -lrt
+>> vi test.yml
+>> vi requirements.yaml
+>> ansible-galaxy install -r requirements.yaml
+>> ls -lrt
+>> cp -r /root/.ansible/roles/ansiblebit.oracle-java/ .
+>> cd ..
+>> pwd
+>> cp -r /root/kafka-project/
+>> cp -r /root/kafka-project/macunha1.confluent_kafka/ansiblebit.oracle-java/ .
+>> ls
+inventory
+ansible.cfg
+macunha1.confluent_kafka
+ansiblebit.oracle-java
+>> cd macunha1.confluent_kafka
+>> ls -lrt
+>> rm -rf ansiblebit.oracle-java
+>> ls -lrt
+>> vi README.md
+>> vi inventory
+[kafka]
+ansiblenode1
+ansiblenode2
+ansiblenode3
+
+[zookeeper]
+ansiblenode1
+ansiblenode2
+ansiblenode3
+
+>> vi kafka.yml
+---
+- hosts: kafka,zookeeper
+
+  roles:
+    - ansiblebit.oracle-java
+    - macunha1.confluent_kafka
+
+>> ansible all -m ping
+>> ansible-playbook -vv kafka.yml
+>> ansible-galaxy install geerlingguy.java
+>> cp -r /root/.ansible/roles/geerlingguy.java/ .
+>> ls -lrt
+>> vi kafka.yml
+---
+- hosts: kafka,zookeeper
+  roles:
+    - geerlingguy.java
+    - macunha1.confluent_kafka
+
+>> ansible-playbook -vv kafka.yml
+## check installed or not
+>> ssh ansibleuser@ansiblenode1
+>> sudo su -
+>> find / -name kafka
+>> find / -name zookeeper
+>> nc -vz localhost 2181
+>> nc -vz localhost 9092
+>> ps-ef | grep -i kafka
+>> cd bin
+>> ./kafka-topics --zookeeper localhost --list
+>> ./kafka-topics --zookeeper localhost --create --topic example --partions 2 --replication-factor 1
+>> ./kafka-topics --zookeeper localhost --list
+>> ./kafka-console-producer
+>> 
+-----------------------------------------------------------
+34 - how to connect large number of target servers.
+-----------------------------------------------------------
+35 -         
+
+

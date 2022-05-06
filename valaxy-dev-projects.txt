@@ -1,0 +1,538 @@
+valaxy
+-------------------------------------------------------------
+1. Production Ready CI/CD Pipeline Using Jenkins, Ansible, Docker, Kubernetes
+
+>>>> services used to setup CI/CD
+
+	>>> Tools:- 
+	   ++ AWS
+	   ++ Docker
+	   ++ Kubernetes
+	   ++ Nexus
+	   ++ Sonarqube
+
+	>>> simple ci/cd 
+
+        2. Build& Test  3.Deploy
+	git------> jenkins ----------> Amazon EC2 
+	 ^
+	 |
+	 |
+1.code commit	 		   
+
+
+      >>>> Introducing Ansible in CI/CD
+
+
+      2.Build& Test   3.Initialize Ansible
+	git------> jenkins ----------> Ansible 
+	 ^                                 |
+	 |                                 |4.Deploy
+	 |                                 ^
+1.code commit	                    Amazon EC2  
+
+		
+	  >>>>  Introducing Nexus in CI/CD
+
+       2.Build&Test    4. Initialize Ansible
+	git------> jenkins ----------> Ansible 
+	 ^           |                   |
+	 |           |3.store            |5.Deploy
+	 |           |Artifacts          |
+1.code commit	 ^                   |
+                Nexus                |
+                  |                  ^
+                  |---------------->Amazon EC2
+                              	  
+
+        >>>> Introducing SonarQube in CI/CD
+        
+
+             sonarQube
+                 ^ 
+                 |
+    2.Build&Test |   4. Initialize Ansible
+	git------> jenkins ----------> Ansible 
+	 ^           |                   |
+	 |           |3.store            |5.Deploy
+	 |           |Artifacts          |
+1.code commit	 ^                   |
+                Nexus                |
+                  |                  ^
+                  |---------------->Amazon EC2
+   
+
+
+		>>>> Introducing Docker in CI/CD
+
+
+             sonarQube
+                 ^ 
+                 |
+    2.Build&Test |   4. Initialize Ansible
+	git------> jenkins ----------> Ansible 
+	 ^           |                   |
+	 |           |3.store            |5.Deploy
+	 |           |Artifacts          |
+1.code commit	 ^                   |
+                Nexus                |
+                  |                  ^
+                  |---------------->Docker
+
+
+       >>>> Introducing Kubernetes in CI/CD
+       
+
+             sonarQube
+                 ^ 
+                 |
+    2.Build&Test |   4. Initialize Ansible
+	git------> jenkins ----------> Ansible 
+	 ^           |                   |
+	 |           |3.store            |5.Deploy
+	 |           |Artifacts          |
+1.code commit	 ^                   |
+                Nexus                |
+                  |                  ^
+                  |---------------->Docker and kubernetes
+
+
+		>>>> Introducing Nagios in CI/CD
+
+
+
+             sonarQube
+                 ^ 
+                 |
+    2.Build&Test |   4. Initialize Ansible
+	git------> jenkins ----------> Ansible 
+	 ^           |                   |
+	 |           |3.store            |5.Deploy
+	 |           |Artifacts          |
+1.code commit	 ^                   |
+                Nexus                |
+                  |                  ^
+                  |---------------->Docker and kubernetes
+                                      |
+                                      |
+                Nagios<---------------|                   
+                        6. Monitor
+
+
+-----------------------------------------------------------
+2. CI/CD setup pre-requisites for Simple pipeline
+
+>>> pre-requisites to start with simple CI/CD
+   
+   ++ Github account
+   ++ Simple java project
+   ++ AWS account
+   ++ Jenkins server(Linux)
+   ++ Maven & Git installation and configuration
+   ++ Tomcat server (Linux)
+
+Optional:-
+----------
+++ How to create a EC2 instance and login
+
+				Installation
+
+1. Launch Red-hat Linux EC2 instance
+
+2. Install java and set path
+ # yum install java-1.8*
+ # export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64/
+ # PATH=$PATH:$JAVA_HOME
+
+3. Download jenkins on to EC2 instance
+   # sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat/jenkins.repo
+   # sudo rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
+
+   Reference link: https://pkg.jenkins.io/redhat/
+
+ 4. Install Jenkins
+   # yum install jenkins
+
+ 5. Start jenkins service
+   # service jenkins start
+
+ Check point:
+ Check java and jenkins version
+ # java --version
+
+ 			Configuration
+
+ 1. Open default port 8080 in security group
+ 
+ 2. Login to jenkins console
+  # <public-ip>:8080
+    Username: admin
+    password location: /var/lib/jenkins/secrets/initialAdminPassword
+ 3. Skip plugins installation (we can do it later)
+ 
+ 4. change admin password
+   >admin   >configure >password
+
+ 5. Configure java path under jenkins configuration
+   >manage jenkins >Global tool configuration >JDK
+
+>>>> Jenkins Installation & Configuration on AWS EC2 instance
+
+  ++ launch ec2 instance and atfer
+  >> sudo su -
+  >> yum install java-1.8*
+  >> java -version
+  >> java make it as a perminent
+  >> vi .bash_profile
+  JAVA_HOME=/usr/lib/jvm/  java-1.8.0-openjdk-1.8.0.332.b09-1.el8_5.x86_64
+
+  PATH=$PATH:$JAVA_HOME:$HOME/bin
+
+>> echo $PATH
+>> sudo yum install wget -y
+>> sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat/jenkins.repo
+>> sudo rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
+>> sudo yum install jenkins -y
+>> service jenkins start
+>> service jenkins status
+
+goto jenkins dashboard -> Global tool configuration -> JDK -> Add jdk -> 
+Name -> Java
+JAVA_HOME -> /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.000x86_64
+
+apply and save
+
+>> find / -name javac
+            			      
+  >>>> Run a test job
+1. Create "new item"
+2. Enter an item name - hello-world
+         chose Freestyle project
+3. Under Build section
+   Execute shell : echo "hello world"
+
+4. save your job
+5. Build job
+6. Check "console output"
+
+create a new job -> hello-world -> Freestyle project
+
+General -> Description -> This is a test job
+Build -> Execute shell -> 
+echo "Hello , welcome to dev-world"
+apply and save
+Buildnow
+
+>>>> Setup & configure Tomcat on EC2 instance | Tomcat server setup
+
+>>>> setup & Configure Tomcat server
+
+        >>>> steps to install Tomcat on linux
+1. Launch a Redhat Linux server
+2. Install and set path 
+# yum install java-1.8*
+# export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.x86_64
+
+edit /etc/profile file to set JAVA_HOME path permanently for all users.
+
+3. Download tomcat package form https://tomcat.apache.org/download-80.cgi
+4. copy and extract giz file under to /opt/tomcat directory
+5. Add below users to tomcat-user.xml file under conf directory in tomcat
+
+
+6. Change default port number 8080 to 8090.Because jenkins also port 8080. none of the ports in a same in one Environment.
+7. Start tomcat services by using startup.sh under bin directory
+
+Additional step:
+  Create a link file to start/stop services if necessary.
+
+check point:
+  access tomcat from browser by using http://<public-ip>:8090. you should able to see default tomcat page.
+
+
+ >>> lauch the redhat ec2 instance name like webserver
+>> sudo su -
+>> yum install java-1.8*
+>> java -version
+
+goto google tomcat 8 download
+
+Binary Distributions -> core -> tar.gz -> copy link address
+
+>> cd /opt
+>> ls
+>> yum install wget -y
+>> wget <tomcat-copy link address>
+>> tar -zvxf tomcat.tar.gz
+>> cd apache-tomcat-8.5.31
+>> cd bin
+>> ps -ef | grep tomcat
+>> ls -ltr
+>> chmod +x startup.sh
+>> chmod +x shutdown.sh
+>> pwd
+/opt/apache-tomcat-8.5.31/bin
+>> ./startup.sh
+>> echo $PATH
+>> create a softlink
+>> ln-s /opt/apache-tomcat-8.5.31/bin/startup.sh /usr/local/bin/tomcatup
+>> ln-s /opt/apache-tomcat-8.5.31/bin/shutdown.sh /usr/local/bin/tomcatdown
+>> tomatup
+>> ps -ef | grep tomcat
+>>
+                        
+goto browser <public-ip>:8080
+
+goto tomcat directory
+>> ls
+>> cd conf
+>> ls 
+>> vi server.xml
+change the port 8090
+>> restart the tomcat service
+>> tomcatdown
+>> ps -ef | grep tomcat
+>> tomcatup
+>> 
+
+goto browser <public-ip>:8090
+
+>> find / -name context.xml
+>> vi /opt/apache-tomcat-8.5.31/webapps/host-manager/META-INF/context.xml
+<!-- <Valve className=>
+    allow="127\.d+\."/> -->
+
+>> vi /opt/apache-tomcat-8.5.31/webapps/manager/META-INF/context.xml     
+<!-- <Valve className=>
+    allow="127\.d+\."/> -->
+>> tomcatdown
+>> tomcatup
+
+create users
+>> ls
+>> vi tomcat-users.xml
+    <role rolename="manager-gui"/>
+    <role rolename="manager-script"/>
+    <role rolename="manager-jmx"/>
+    <role rolename="manager-status"/>
+    <user username="admin" password="admin" roles="manager-gui, manager-script, manager-jmx, manager-status"/>
+    <user username="deployer" password="deployer" roles="manager-script"/>
+    <user username="tomcat" password="s3cret" roles="manager-gui"/>
+
+>> tomcatdown
+>> tomcatup
+>> cat tomcat-users.xml
+>>     
+    
+-----------------------------------------------------------
+>>>> Installing & Configure Maven on AWS EC2 instance | Maven setup & configuration on Jenkins.
+
+>>> Installation
+
+1. Download maven on jenkins server. In our case it is /opt/maven
+
+ Link: https://maven.apache.org/download.cgi
+ Binary tar.gz archive -> apache-maven-3.5.3-bin.tar.gz
+ # wget <maven_download_link>
+
+ >> cd /opt
+ >> mkdir mavem
+ >> cd maven
+ >> cd maven
+ >> wget <maven-download-link>
+ >> tar -xvzf apache-maven-3.5.3-bin.tar.gz
+ >> ls
+ >> cd apache-maven-3.5.3
+ >> pwd
+ >> copy the path
+ >> vi .bash_profile
+
+2. Setup M2_HOME and M2 paths in .bash_profile of user.
+  M2_HOME=/opt/maven/apache-maven-3.5.3
+  M2=$M2_HOME/bin
+  PATH=$PATH:$JAVA_HOME:$M2_HOME:$M2:$HOME/bin
+
+>> echo $PATH
+
+3. Install git
+ # yum install git -y
+
+Check point:
+Check maven version
+# mvn --version
+
+
+>>> configuration
+
+1. Login to jenkins console
+
+2. Install maven & git plugin without restart
+  Manage Jenkins  > Manage Plugins >Available > "Maven Invoker" 
+  Manage Jenkins > Manage Plugins >Available > "github"
+
+3. Set maven & git path
+  Manage Jenkins > Global Tool Configuration < Maven
+
+  Name -> Maven
+  MAVEN_HOME -> /opt/maven/apache-maven-3.5.3
+
+apply and save
+
+  Manage Jenkins > Global Tool Configuration < git
+
+  >>> Run a test job
+
+1. Create "new item"
+2. Enter an item name -> maven-hello-world
+    chose maven project
+3. Select "git" as source code management and give below maven project
+  
+  git - https://github.com/arsr319/maven-hello-world.git
+  Build -> Root POM -> pom.xml
+  Goals - install package
+4. Save your job
+5. Build job
+6. Check "console output"
+
+        >>> Next installation
+    ++ installing jenkins slave
+    ++ Install Nexus
+    ++ Build a job to store artifacts on Nexus
+
+-----------------------------------------------------------
+>>>> Mini DevOps 03 - Configure Global Jenkins Server Security | Securing Jenkins Server
+
+goto jenkins dashboard -> goto admin panel -> config -> password -> change password
+
+#remove the file from your server
+>> goto jenkins server
+>> ls -l secrets
+>> rm ./secrets/initialAdminPassword
+>> y
+>> goto jenkins dashboard -> manage jenkins -> configure global security -> enable security -> ssh server ->disable
+
+save and apply
+
+------------------------------------------------------------
+
+11 - Simple DevOps Project-1 | Simple DevOps project for CI/CD | CI/CD through Jenkins
+
+
+  >>> simple ci/cd 
+
+        2. Build& Test  3.Deploy
+  git------> jenkins ----------> Amazon EC2(tomcat-server) 
+   ^
+   |
+   |
+1.code commit        
+
+
+https://github.com/ravitejasunshine/hello-world-1.git
+
+-----------------------------------------------------------
+
+12.Simple DevOps Project-2 | CI/CD pipeline using GIT, Jenkins & Ansible
+
+>>>> Devops CI/CD pipeline setup
+
+
+  >>> simple ci/cd 
+
+        2. Build& Test  3.Deploy
+  git------> jenkins ----------> Amazon EC2(tomcat-server) 
+   ^
+   |
+   |
+1.code commit        
+
+
+        >>>> Introducing Ansible in CI/CD
+
+  >>> simple ci/cd 
+
+        2. Build& Test  3.Initialize Ansible
+  git------> jenkins ----------> Ansible-server 
+   ^                                    |
+   |                                    |4.Deploy
+   |                                    ^
+1.code commit                       Apache Tomcat
+
+
+>>> Introducing Ansible in CI/CD
+
+1. Lab setup which was created for "Simple Devops project for CI/CD" should available
+2. Follow "Ansible Installation & Configuration on AWS" video for Ansible setup
+
+In this video
+
+1. Enable password less authentication b/w Ansible and tomcat server
+2. Install "publish over ssh" plug-in on jenkins server
+3. Write a playbook to copy jar/war file on to tomcat server
+4. Modify jenkins job to copy artifacts and initiate Ansible playbook.
+
+>>>> Ansible Installation & Configuration on AWS
+
+1. Launch Red-hat Linux EC@ instance
+
+2. Update your EC2 instance
+   #yum update
+
+3. Add a third party repository name EPEL(Extra packages for Enterprise Linux)
+   # rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
+4 Install Ansible
+   # yum install ansible
+
+Testing:
+
+check ansible version
+# ansible --version
+
+  >>> Configuration
+
+1. Create a new user for ansible administration & grant admin access to user (master and slave)
+
+   # useradd ansadmin
+   # passwd ansadmin
+
+2. Enable user login on all Ec2 instances.(master & slave)
+   # vi /etc/ssh/sshd_config
+
+3. Login as a ansadmin user on master and generate ssh key (master)
+   # ssh-keygen
+
+4. copy keys to target servers(master)
+   # ssh-copy-id <target-server>
+
+5. update target servers information on /etc/ansible/hosts file(master)
+   # echo "10.10.x.x" > /etc/ansible/hosts
+
+Testing:
+run ansible command as a ansadmin user it should be successful(Master)
+   # ansible all -m ping
+
+    >>>> Ansible Simple commands
+
+Rebooting - ansible all -a "sbin/reboot"
+
+Copy file - ansible all -m copy -a "src=/home/dan dest=/tmp/home"
+
+Create user - ansible all -m user -a "name=testuser password=<encrypted password>"
+
+Remove user - ansible all -m user -a "name=testuser state=absent"
+
+Change file permission - ansible all -m file -a "dest=/home/dan/file1.txt mode=777"
+
+install package - ansible all -m yum -a "name=httpd state=latest"
+
+start a service - ansible all -m service -a "name=httpd state=started"
+
+start a service - ansible all -m service -a "name=httpd state= stopped"
+
+
+
+
+
+
+

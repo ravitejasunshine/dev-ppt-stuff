@@ -1,0 +1,297 @@
+Ansible:-
+ansible real time projects search on youtube
+-------------------------------------------------------------
+1- What Is Ansible?
+ansible is a configuration management tool.
+
+-------------------------------------------------------------
+2- Working with YAML files
+
+>> yaml (yet another markup language):-
+
+key    value 
+hello  welcome
+
+ansible is key value representaion
+singler  -> -
+multiple -> ---
+
+---------------------------------------------------------
+3-Ansible Architecture and set up instructions 
+
+>>>Important topics:-
+>> ansible Playbooks
+>> ansible roles
+>> ansible voults
+>> ansible tower
+>> ansible galaxy
+
+this all modules are integration with jenkins.
+
+## playbook
+it is a set of tasks
+
+## inventory file
+/etc/ansible/hosts
+
+----------------------------------------------------------
+4-AWS DevOps | Ansible Implementation Part#1
+
+                  master
+                  [inventory]
+                   |
+                   |
+                   |
+                   |
+                   node1
+                   |
+                   |
+                   node2
+                   |
+                   |
+                   node3
+
+                    >>>> Ansible implementation
+    >>> yaml
+>> yaml file
+
+yaml file
+|-------|        |----------|
+|       |        |master    |---------------> node1
+|       |------->|node      |---------------> node2
+|-------|        |----------|---------------> node3 
+
+
+
+steps:
+1- provisioning Ec2-instances
+
+create 3 ec2 instances (amazon ami) 
+one is ansible master
+two is ansible node-1
+three is ansible node-2
+
+2- install python
+note:- ansible modules  written in python.
+check the python in ec2 instances
+> python --version
+
+3 - install ansible
+ansible master
+
+> sudo su -
+> yum install ansible -y
+        or
+> sudo amazon-linux-extras install ansible2 -y
+
+4-Creating common user on all machine
+
+## ansible-node1
+> sudo su -
+> adduser ansibleuser
+> passwd ansibleuser
+
+## ansible-node2
+> sudo su -
+> adduser ansibleuser
+> passwd ansibleuser
+
+## ansible master
+> ansible --version
+> sudo su -
+> adduser ansibleuser
+> passwd ansibleuser
+
+5-Giving permissions(VISUDO)
+
+## ansible-master
+> visudo
+ goto /wheel group
+++ same thing without a password
+ansibleuser   ALL=(ALL)   NOPASSWORD: ALL
+
+
+## ansible-node1
+> visudo
+ goto /wheel group
+++ same thing without a password
+ansibleuser   ALL=(ALL)   NOPASSWORD: ALL
+
+## ansible-node2
+> visudo
+ goto /wheel group
+++ same thing without a password
+ansibleuser   ALL=(ALL)   NOPASSWORD: ALL
+
+
+6 - Passwordless authentication enabling(vi /etc/ssh/sshd_config)->yes
+
+## ansible-master
+> vi /etc/ssh/sshd_config
+PasswordAuthentication yes
+
+
+## ansible-node1
+> vi /etc/ssh/sshd_config
+PasswordAuthentication yes
+
+## ansible-node2
+> vi /etc/ssh/sshd_config
+PasswordAuthentication yes
+
+
+7-Restart the service(service servicename reload or restart)
+Servicename here is sshd
+
+## ansible-node1
+> service sshd reload
+
+## ansible-node2
+> service sshd reload
+
+
+8-Generating key form common user login (ssh-keygen)
+
+## ansible-master
+> sudo su - ansibleuser
+> ssh-keygen
+> ssh-copy-id <ansible-node1-ip>
+ ++ copy the ansible-node1-ip address
+ ++ ip r to get ip address
+> ssh-copy-id <ansible-node2-ip>
+ ++ copy the ansible-node2-ip address
+
+9-copy key to all nodes(ssh-copy-id)
+10- Add all the nodes to the inventory (vim /etc/ansible/hosts)
+
+## ansible-master
+> ansible -m ping all
+> sudo vi /etc/ansible/hosts
+shift +g  (# lastline of the page.)
+> sudo su - ansible
+> exit
+> sudo vi /etc/ansible/hosts
+shift +g  (# lastline of the page.)
+[webservers]
+ansible-node1-ip
+ansible-node2-ip
+
+
+11-ADD all the nodes to the INVENTORY(vi /etc/hosts/ansible/hosts)
+12-Test the conncection(ansible -m ping all) ping is module here
+
+## ansible-master
+> sudo su - ansibleuser
+> ansible -m ping all
+
+---------- configuration done --------------------------
+
+--------------------------------------------------------
+5-AWS DevOps | Ansible Implementation Part#2
+
+>> what is ansible commands
+>> what is ansible ad-hoc commands
+>> what is ansible modules
+modules is set of predefined functions.
+
+yaml:-
+Before yaml or playbook writing basic knowledge on Adhoc command and modules idea is required.
+
+                ### ansible Ad-hoc practice
+## ansible ad-hoc commands
+
+## what is modules and how does it work:-
+modules are predefined set of programs which are responsible to perform any task and are written in python.
+
+## ansible ad-hoc syntax :-
+
+ansible [-i inventory name] {groupname or servername or both} -m [module] -a "arguments"
+
+# some of the modules used:
+1. get_url
+2. copy
+3. file
+4. user
+5. ping
+6. yum
+7. shell
+8. service
+9. unarchieve
+
+>> ansible-doc -l | wc -l
+all modules here
+
+>> sudo su - ansibleuser
+>> ansible -m ping all
+ping all the servers(node-1&2)
+
+>> ansible-doc -l | wc -l
+>> ansible-doc -l | grep shell
+>> ansible-doc shell
+>> ansible all -m shell -a 'top'
+>> ansible all -m shell -a 'date'
+>> ansible all -m ping
+>> ansible all -m shell -a 'df -h'
+>> ansible all -m shell -a 'uptime'
+>> ansible all -m shell -a 'free -m'
+>> ansible -m shell -a "free -m" ansible-node1ip
+>> ansible -m shell -a "free -m" ansible-node1ip:ansible-node2ip
+>> ansible -m shell -a "free -m" webservers
+
+>> sudo su - ansibleuser
+>> exit
+>> sudo su -
+>> vi /etc/ansible/hosts
+[webservers]
+ansible-node1-ip
+[appservers] 
+ansible-node2-ip
+>> sudo su - ansibleuser
+>> ansible -m shell -a "free -m" webservers
+>> ansible -m shell -a "free -m" appservers
+>> ansible -m shell -a "free -m" webservers:appservers
+
+goto google -> ansible modules of get_url
+
+lets see some sample
+1.java install
+2. git
+3. maven
+4. downloading
+5. extracting once download is done
+6. mysql
+7. nginx
+8. httpd
+
+
+                    ### install java
+## ansible-master
+>> ansible -m yum -a "name=java-1.8.0-openjdk state=present" all
+
+## goto ansible-node1
+>> java -version
+
+## goto ansible-node2
+>> java -version
+
+            ### install git
+## ansible-master
+>> ansible -m yum -a "name=git state=present" all
+
+## goto ansible-node1
+>> git
+
+## goto ansible-node2
+>> git
+
+        ## copy module
+## ansible-master
+>> echo "movie is verygood" >> kgf.txt
+>> mv kgf.txt /tmp
+>> cat /tmp/kgf.txt
+>> ansible -m copy -a "src=/tmp/kgf.txt dest=/tmp" all
+
+            ## sshd running or not
+## ansible-master
+>> ansible -m shell -a "/sbin/service sshd status" all
+

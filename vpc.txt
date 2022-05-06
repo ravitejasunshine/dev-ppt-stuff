@@ -1,0 +1,828 @@
+VPC(virtual private cloud):-
+-------------------------------------------------------------
+>>>> Aws vpc part-1
+
+>>> networking basics:-
+------------------
+++ ipaddresses
+ipv4 - 32 bit
+ipv6 - 128 bit
+++ Cidr (classless Inter-Domain Routing)
+
+++ what is subneting
+++ Internet gateway and router
+
+overview:-
+---------
+++ IP addressing
+++ subnets
+++ Internet gateway
+++ Router
+
+-------------------------------------------------------------
+>>>> Aws vpc part-2
+
+>>> Vpc architecture:-
+
+------------------------------------------------------------
+>>>> AWS VPC Part#3 
+
+>>> CIDR Range |IP address
+
+1. what is CIDR range?
+2. How to set IP addresses to subnets?
+
+1. what is CIDR range?
+----------------------
+CIDR = classless Inter-Domain Routing
+
+
+>> CIDR setup:-
+
+		10.0.0.0
+
+		10        0        0         0
+        ^         ^        ^         ^
+        octet 1   octet 2  octet 3   octet 4
+        ^         ^        ^         ^
+        8 bits    8 bits   8 bits    8 bits
+        ^         ^        ^         ^
+        0-255     0-255    0-255     0-255
+
+number   binary format
+ 0            0
+ 1            1
+ 2            10
+ 3            11
+ 4            100
+ 5            101
+ 6            110
+ 7            111
+ 8            1000
+ 9            1001
+ 10           1010
+ .             .
+ .             .
+ 254          11111110
+ 255          11111111
+
+ 				10.0.0.0/n
+ 				n = Net mask
+ 				16 to 32
+ configurable Net mask in one Vpc is 16 to 28.				
+---------------------------------------------
+ip range           no of available ips
+10.0.0.0/32 		      1
+10.0.0.0/31               2
+10.0.0.0/30               4
+10.0.0.0/29               8
+10.0.0.0/28               16
+10.0.0.0/27               32
+10.0.0.0/26               64
+10.0.0.0/25               128
+10.0.0.0/24               256
+10.0.0.0/23               512
+10.0.0.0/22               1024
+10.0.0.0/21               2048
+10.0.0.0/20               4096
+10.0.0.0/19               8192
+10.0.0.0/18               16384
+10.0.0.0/17               32768
+10.0.0.0/16               65536
+--------------------------------			
+
+		10.0.0.0/24 = 256
+		10.0.0.0/24 = 256-5 = 251
+Reserved ips:-
+10.0.0.0 -> network address.
+10.0.0.1 -> Reserved by aws for the vpc router.
+10.0.0.2 -> Reserved by aws for dns.
+10.0.0.3 -> Reserved by aws for future use.
+10.0.0.255 -> network broadcast address.
+
+vpc    10.0.0.0/24
+sub1   128         10.0.0.0/25
+sub2   64          10.0.0.128/26
+sub3   64          10.0.0.192/26
+---------------------------------------------------------
+>>>> AWS VPC Part#4 | VPC Practical | NAT Gateways 
+
+1. VPC Lab
+2 .NAT Gateways
+
+### create vpc :-
+------------
+name-tag -> Myfirstvpc 
+ipv4 cidr block -> 10.0.0.0/24
+click on creatre vpc
+
+goto actions -> edit dns hostnames -> enable -> save changes
+
+### create subnets:-
+--------------------
+
+## create subnet-1
+create subnet ->
+vpc id -> select the previous created vpc
+## subnet settings
+subnet name -> mypublicsubnet
+availability zone -> ap-south-1a
+ipv4 cidr block -> 10.0.0.0/25
+click on create subnet
+
+## create subnet-2
+create subnet ->
+vpc id -> select the previous created vpc
+## subnet settings
+subnet name -> myprivatesubnet
+availability zone -> ap-south-1a
+ipv4 cidr block -> 10.0.0.128/25
+click on create subnet
+
+### Create Internet Gateways
+
+#create internet gateway
+Name tag -> myfirstIGW
+click on internet gateway
+
+#goto IGW actions 
+actions -> attach to vpc
+available vpcs -> myfirstvpc
+click on attch internet gateway
+
+
+### create a Route tables
+# create route table -1 
+name tag -> myfirstRT-public
+vpc    -> myfirstVPC
+create
+
+# create route table-2 
+name tag -> mysecondRT-private
+vpc    -> myfirstVPC
+create
+
+### myFirst-public 
+# goto subnet associations
+edit subnet associations
+
+myfirstRT-public -> mypublicsubnet (## attach the subnet)
+save
+
+# routes 
+edit routes
+add route 
+destination -> 0.0.0.0/0
+target -> internet gateway -> myfirstIGW 
+save routes
+
+### MysecondRT-private
+# goto subnet associations
+edit subnet associations
+
+mysecondRT-public -> myprivatesubnet (## attach the subnet)
+save
+
+# routes 
+---no changes here,because of private subnet---
+
+### create EC2 instance 
+create ec2 instance -> microsoft windows server
+instance type -> t2.micro 
+configure instance ->  
+network -> myfirstvpc
+subnet  -> mypublicsubnet | ap-south-1a
+auto-assign public ip -> enable
+launch instance
+
+ec2 instance -> rename to public
+
+## create second ec2 instance 
+configure details
+network -> myfirstvpc
+subnet  -> myprivatesubnet | ap-south-1a
+auto-assign public ip -> enable
+launch instances
+
+ec2 instance -> rename to private
+
+
+## generate password
+### first and second instances of ec2
+goto ec2 instance -> actions -> security -> get windows password 
+
+## ec2 connect to desktop
+goto windows desktop
+ 
+ windows + r => mstsc
+copy the public ip and paste into 
+computer -> connect
+
+give : - username and password
+
+ two instances connected
+
+ ### vpc:-
+## nat gateways
+create Nat gateway ->
+name -> myfirstNGW
+subnet -> mypublicsubnet
+Elastic ip allocation -> allocate elastic ip
+create nat gateway
+
+### note:
+remove the elastic ip, because bill is generating
+
+goto elastic ips -> goto actions -> Release elastic ip addresses
+
+
+### goto route tables 
+mySecondRT-private -> Routes -> edit routes ->
+add route -> 
+destination        target
+0.0.0.0/0          NAT gateway
+save routes
+
+goto nat gateways -> actions -> delete nat gateway
+-----------------------------------------------------------
+>>>> AWS VPC Part-5 | NAT Gateways 
+
+nat gateways dhawra internet andenedi private subnets dhawra create chesina ec2 instances ki ela provide cheyachu ani daniki usechestam.
+
+create nat gateway
+name -> myNGW2
+subnet -> mypublicsubnet
+Elastic ip allocation  -> allocate elastic ip
+create nat gateway
+
+## note: after practice you can delete the elastic ips and nat gateways.
+
+## goto route tables
+MySecondRt-Private -> routes -> edit routes -> 
+
+Destination         Target 
+0.0.0.0/0           Nat-gateway 
+save routes
+
+
+##goto routes 
+mysecondRT-private -> routes -> edit routes -> delete the 
+
+Destination         Target 
+0.0.0.0/0           Nat-gateway 
+save routes
+
+## note: don't delete the natgat way route table. just for practice.
+
+----------------------------------------------------------
+>>>> 6- AWS VPC Peering
+
+### VPC peering
+
+1. VPC peering basics.
+2. VPC peering connection lifecycle.
+3. Multiple VPC peering connections.
+4. VPC peering limitations.
+
+>> what is vpc peering?
+
+
+>> vpc peering connection lifecycle.
+
+Initiating         pending
+request     ----> acceptance ----> provisioning ---> Active
+
+
+initiating
+request    ---> pending acceptance
+  |
+  |
+  |
+  ^
+Failed  
+
+
+
+initiating      pending
+request    ---> acceptance ---> Provisioning ---> Active
+  |              |       |\ \                     /|
+  |              |       | \ \                   / /
+  |              |       |  \ \                 / / 
+  ^              ^       |   \ \--->Deleting<--/ /
+Failed          Expired  |    \     /           /
+  |             |    Rejected  \   ^           / 
+  |             |      |       Deleted <------/ 
+  |             |      |        |
+  |             |      |        |
+  |             |      |        |
+   \            |      |        /
+    \           |      |       / 
+     \---No longer visible----/
+      
+
+### multiple vpc peering connections
+A vpc peering connection is a one to one relationship between two vpcs. you can create multiple vpc peering connections for each vpc that you own, but transitive peering relationships are not supported. You do not have any peering relationship with vpcs that your vpc is not directly peered with.
+
+### vpc peering limitations.
+++ you cannot create a vpc peering connection between vpcs that have matching or overlapping ipv4 or ipv6 cidr blocks.
+++ vpc peering does not support transitive peering relationships.
+++ you cannot have more than one vpc peering connection between the same two vpcs at the same time .
+---------------------------------------------------------
+>>>> 7- AWS VPC Peering Lab | VPC Peering Practical  
+
+### create a VPC peering connection with a vpc in the same region.
+### create a VPC peering connection with a Vpc in a different region.
+### creating a VPC peering connection with a Vpc in another aws account.
+
+### vpc peering lab:-
+--------------------
+
+two different vpc's in bitween create a communication is called vpc peering.
+
+### peering rules:-
+1. No overlap ip ranges between the 2 vpcs
+
+        vpc1                 vpc2           (##wrong method)
+     10.0.0.0/24             10.0.0.0/24      
+
+        vpc1                 vpc2           (##right method)
+     10.0.0.0/24             11.0.0.0/24         
+
+2. No transitive peering, IGW access across vpcs
+
+        Destination            Target
+        10.0.0.0/24             Local
+        0.0.0.0/0               Igw-id
+        11.0.0.0/0              Igw-id       (#wrong method)
+
+
+3. No NAT routing between VPCs
+4. No cross referencing of security groups between VPCs
+
+
+### peering settings
+++ Both VPC owners should accept the request
+++ Route tables should update after the VPC peering done
+
+### VPC peering same account and same region
+
+## create vpc 
+name -> Firstvpc_region-1
+ipv4 cidr block -> 10.0.0.0/24
+create vpc
+
+## create subnet-01
+vpc id -> Firstvpc_region-1
+subnet name -> Publicsubnet_vpc1
+availabilty zone -> ap-south-1a
+ipv4 cidr block -> 10.0.0.0/25
+create subnet
+
+
+## create subnet-02
+vpc id -> Firstvpc_region-1
+subnet name -> Privatesubnet_vpc1
+availabilty zone -> ap-south-1a
+ipv4 cidr block -> 10.0.0.128/25
+create subnet
+
+## create internet gateway
+create internet gateway
+name -> firstvpc_IGW
+
+goto created vpc section -> Actions -> attach to vpc -> 
+available vpcs -> firstvpc_region1
+attach internet gateway
+
+## create route table -01
+create route table 
+name -> FirstRT_VPC1_public
+vpc  -> Firstvpc_region1
+create
+
+## create route table -02
+create route table 
+name -> FirstRT_VPC1_private
+vpc  -> Firstvpc_region1
+create
+
+
+## FirstRT_vpc1_public
+
+#subnet associations -> edit subnet associations -> 
+publicsubnet_vpc1 -> save
+
+# routes
+add route -> 
+
+Destination        Target
+0.0.0.0            internet-gateway(firstvpc_IGW)
+save routes
+
+## First_vpc_private
+
+# subnet associations -> edit subnet associations -> privatesubnet_vpc1
+save
+
+# route
+----here no routes adding--------
+---- no internet attach here ------------
+
+### create second vpc
+create vpc 
+name -> secondvpc_region1
+ipv4 cidr block -> 11.0.0.0/24
+create vpc
+
+## create subnet01
+## publicsubnet_vpc1
+create subnet -> 
+vpc -id -> secondvpc_region1
+subnet name -> publicsubnet_vpc2
+availability zone -> ap-south-1a
+ipv4 cidr block -> 11.0.0.0/25
+create subnet
+
+## create subnet
+## private subnet_vpc1
+create subnet
+vpc id -> secondvpc_region1
+subnet name -> privatesubnet_vpc2
+availabity zone -> ap-south-1a
+ipv4 cidr block -> 11.0.0.128/25
+create subnet
+
+## create internet gateway
+create internet gateway
+name tag -> secondvpc_IGW
+create internet gateway
+goto actions -> attach to vpc -> secondvpc_region1 -> attach internet gateway
+
+## route tables[1]
+create route table 
+name tag -> secondRT_vpc2_public
+vpc -> secondvpc_region1
+create
+
+## route tables[2]
+create route table 
+name tag -> secondRT_vpc2_private 
+vpc -> secondvpc_region1
+create
+
+
+## secondRT_vpc2_public
+#subnet associations -> edit subnet associations -> publicsubnet_vpc2 -> save
+
+# routes -> edit routes -> add route 
+destination    target
+0.0.0.0/0      internet gateway
+
+save routes
+
+## secondRT_vpc2_private
+#subnet associations -> edit subnet associations ->
+privatesubnet_vpc2 -> save
+
+# routes -> 
+edit routes = <no routes add here>
+
+
+### create ec2 instances[1]
+choose ami -> microsoft windows server 2019
+choose type -> t2.micro
+configure instance details -> 
+  + network -> Firstvpc_region1
+  + subnet  -> publicsubnet_vpc1 | ap-south-1a
+  + auto-assign public ip -> enable
+Review and launch 
+
+instance name = vpc1_public
+
+### create ec2 instances[2]
+choose ami -> microsoft windows server 2019
+choose type -> t2.micro
+configure instance details -> 
+  + network -> Firstvpc_region1
+  + subnet  -> privatesubnet_vpc1 | ap-south-1a
+  + auto-assign public ip -> enable
+Review and launch 
+
+instance name = vpc1_private
+
+### create ec2 instances[3]
+choose ami -> microsoft windows server 2019
+choose type -> t2.micro
+configure instance details -> 
+  + network -> Secondvpc_region1
+  + subnet  -> publicsubnet_vpc2 | ap-south-1a
+  + auto-assign public ip -> enable
+Review and launch 
+
+instance name = vpc2_public
+
+### create ec2 instances[1]
+choose ami -> microsoft windows server 2019
+choose type -> t2.micro
+configure instance details -> 
+  + network -> Secondvpc_region1
+  + subnet  -> privatesubnet_vpc2 | ap-south-1a
+  + auto-assign public ip -> enable
+Review and launch 
+
+instance name = vpc2_private
+
+### generate the password on ec2 instances
+
+#vpc1_public
+goto actions -> security -> get windows password -> browse -> keypair.pemfile -> decrypt
+
+username and password copy into notepad
+copy the publicip
+
+#vpc1_private
+goto actions -> security -> get windows password -> browse -> keypair.pemfile -> decrypt
+
+username and password copy into notepad
+copy the private ip
+
+#vpc2_public
+goto actions -> security -> get windows password -> browse -> keypair.pemfile -> decrypt
+
+username and password copy into notepad
+copy the publicip
+
+
+#vpc2_private
+goto actions -> security -> get windows password -> browse -> keypair.pemfile -> decrypt
+
+username and password copy into notepad
+copy the privateip
+
+#vp1_public remotedesktop through inside connect a vpc1_private remotedesktop 
+
+###  remotedesktop connection
+goto windows  press window + R = mstsc 
+first connect the vpc1_public connect and inside connect vpc1_private -> windows  press window + R = mstsc
+copy the private ip[vpc_private]
+
+inside paste the ip-address[vpc1_private]
+
+vpc1_private :-
+administartor 
+password (vpc1_private)
+
+vpc1_public inside login
+vpc2_private (private ip)
+adminstrator
+password
+
+Note: can't connect the vpc2_private 
+
+### vpc peering connection 
+vpc -> peering connections -> create peering connection -> 
+peering connection name tag -> VPC1_to_VPC2_RegionMumbai
+
+select a local vpc to peer with -> 
+vpc -> Firstvpc_region1
+
+select another vpc to peer with
+Acount -> Myaccount
+region -> This region(ap-south-1)
+
+vpc  -> secondvpc_region1
+
+create peering connection
+
+change -> pending acceptance -> Accept Request -> yes,accept
+
+### route tables
+#first_vpc1_public -> routes -> edit routes -> add route
+
+destination            target         
+11.0.0.0/24        peering connection(vpc1_to_vpc2_regionmumbai)
+
+save routes
+
+# secondRT_vpc2_private 
+routes -> edit routes -> add route 
+
+Destination      target
+10.0.0.0/24      peering connection(vpc1_to_vpc2_regionmumbai)
+
+save routes
+
+## connect rds
+# vpc1_public connect and inside the vpc2_private
+
+
+### vpc peering same account and different region
+
+## change the region mumbai to virginia
+
+## create vpc
+name : vpc_norvir
+ipv4 cidr block :- 12.0.0.0/24
+create vpc
+
+## create subnet[1]
+vpc id : vpc_norvir
+subnet name : publicsubnet_vpc_nv
+availabilty zone : us-east-1a
+ipv4 cidr block : 12.0.0.0/25
+create subnet
+
+## create subnet[2]
+vpc id : vpc_norvir
+subnet name : privatesubnet_vpc_nv
+availabilty zone : us-east-1a
+ipv4 cidr block : 12.0.0.128/25
+create subnet
+
+## create internet gateway
+create internet gateway 
+name -> nvirgvpc_IGW
+create internet gateway
+ goto actions -> attach to vpc -> 
+ available vpcs -> vpc_norvir
+ attach internet gateway
+
+ ## create route tables
+ name -> nvirRT_public
+ vpc -> vpc_norvir
+ create route table
+
+ # subnet associations
+ edit subnet associations -> publicsubnet_vpc_nv(enable)-> 
+ save associations
+
+ # routes
+ edit routes -> add route 
+
+destination               target
+0.0.0.0/0                 internet-gateway
+                          nvirgvpc_IGW   
+save changes
+
+## create route table
+name -> nvirRT_private
+vpc  -> vpc_norvir
+create route table
+
+# subnet associations
+edit subnet associations -> privatesubnet_vpc_nv  
+save associations
+
+## create ec2 instances[1]
+choose ami -> microsoft windows server
+instance type -> t2.micro
+configure instance ->
+network -> vpc_norvir
+subnet -> publicsubnet_vpc_nv
+auto-assingn public ip -> enable
+review and launch
+
+ec2 name is NV_public
+
+## create ec2 instances[2]
+choose ami -> microsoft windows server
+instance type -> t2.micro
+configure instance ->
+network -> vpc_norvir
+subnet -> privatesubnet_vpc_nv
+auto-assingn public ip -> enable
+review and launch
+
+ec2 name is NV_private
+
+## generate passwords
+# nv_public (ec2 instance)
+goto actions -> security -> get windows password
+browse -> xyz.pemkey
+decrypt password
+
+copy the public ip
+copy the password
+
+# nv_public (ec2 instance)
+goto actions -> security -> get windows password
+browse -> xyz.pemkey
+decrypt password
+ 
+copy the private ip
+copy the password
+
+goto windows press windows icon + R 
+mstsc 
+
+give the public ip 
+and username and password
+connect
+
+inside windows server
+private ip 
+and username and password
+connect successfully
+
+vpc1_public (mumbai-region)
+publicip connect to
+private ip (virginia-region)
+
+#connection failed due to not peering.
+#peering to connect the private-ip.
+
+### peering connections (mumbai)
+create peering connection -> 
+name -> vpc1_to_vpc2_regionnvirg
+vpc(requester) -> Firstvpc_region1
+account -> myaccount
+region -> another region -> virginia(us-east-1)
+#goto virginia region
+your vpc -> copy the vpcid(vpc_norvir)
+---------------------------------
+vpc id -> paste the vpcid(vpc_norvir)
+create peering connection
+
+goto virginia region
+goto peering connections -> goto actions -> accept request
+-> yes,accept 
+
+goto mumbai region
+# create route tables
+# FirstRT_vpc1_public
+# routes -> edit routes -> add route 
+
+Destination         Target
+12.0.0.0/24         peering connection(vpc1_to_another)
+
+save routes
+
+
+# goto n virginia region
+# route tables
+# nvirRT_private 
+# routes -> edit routes -> add routes ->
+
+Destination             Target
+10.0.0.0/24             peering connection 
+
+save changes
+
+
+## connect the peering connection
+# region1(mumbai) (vpc1_public)
+public ip 
+username and password
+
+region2 (virginia)(private_ip)
+private ip
+username and password
+
+
+### vpc peering with different account
+## create peering connection
+name -> vpc1_to_another
+vpc(requester) -> firstvpc_region1
+account -> another account
+account id -> paste accountid(target aws id)
+region -> another region -> n virginia(us-east-1)
+----------------------
+copy the taget vpcid
+your vpcs -> vpcid(copy)
+----------------------
+vpcid(accepter) -> paste the target vpcid
+create peering connection
+
+goto target account -> vpc peering connections -> goto actions -> accept request -> yes,accept
+
+## goto mumbai region (source location) 
+# create route tables
+# FirstRT_vpc1_public
+# routes
+edit routes -> add route 
+
+Destination       Target
+13.0.0.0/24       peering connection(vpc1_to_vpc2_regionnvirg)
+save routes
+ 
+## goto virginia region (destination location)
+# create route table
+# route tables
+# privateRT
+routes -> edit routes -> add route -> 
+
+Destination            Target
+10.0.0.0/24            peering connection
+
+save changes
+
+## connect rdp
+vpc1_public 
+mstsc -> vpc1_public ip[source location] to another account private ip[target location]
+
+connect vpc1_public[source location] and inside connect through another account private ip[target location]
+
+-------------------end------------------------------
+
+
+

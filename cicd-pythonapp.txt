@@ -1,0 +1,156 @@
+DevOps:(P1/2)CI-CD Pipeline With Jenkins, Python, Docker, GitHub, DockerHub:-
+-------------------------------------------------------------
+
+continuous integration:-
+------------------------
+++ merge all code work into a master branch
+++ code Reviews, Compile/build, unit Tests, Integration Tests
+
+continuous Delivery:-
+---------------------
+++ Deploy to Test Servers.
+++ UAT,QA
+++ Builds are delivered throughout the life cycle
+
+continuous Deployment:-
+-----------------------
+++ Deploy to prod servers or release
+
+CI/CD Pipeline:-
+----------------
+>> python 3x, pycharm
+>> Docker, Dockerhub account
+>> git, and git-bash or githubDesktop
+>> github account
+>> jenkins server on linux
+>> linux server with docker installed(production server)
+
+>> write a python application
+>> myapp.py
+>> Dockerfile
+FROM python:3.8-slim-buster
+ADD . /python-flask
+WORKDIR /python-flask
+RUN pip install -r requirements.txt
+CMD [ "python", "./myapp.py" ] 
+
+>> docker build -t mypyapp:0.1 .
+>> docker run -d -p 5000:5000 mypyapp:0.1
+
+## goto jenkins dashboard
+>> systemctl start jenkins
+>> systemctl status jenkins
+
+Allow jenkins users to access the docker socket.
+# sudo usermod -aG docker jenkins
+# sudo systemctl restart jenkins
+
+## goto jenkins dashboard
+manage jenkins -> manage plugins -> cloudbees docker and publish plugin -> ssh agent plugin -> 
+
+goto manage jenkins -> manage credentials -> 
+give the credentials -> docker-test(docker login with ssh)
+-> docker-hub-login crentials
+
+goto jenkins dashboard -> create a new job -> 
+Python-ci-cd-pipeline-> pipeline
+ok
+
+general -> Discard old builds ->
+max# of builds to keep -> 5
+
+pipeline ->
+def img
+pipeline {
+    environment {
+        registry = "kss7/python-jenkins"
+        registryCredentials = 'docker-hub-login'
+        dockerImage = ''
+    }
+	agent any 
+
+	stages{
+
+	    stage("build checkout"){
+	        steps {
+	            git 'https://github.com/kss7/SimpleFlaskUI.git'
+	        }
+	    }
+
+	    stage("Stopping Existing Container"){
+            steps{
+                sh returnStatus: true, script: 'docker stop $(docker ps -a | grep $(JOB_NAME) | awk \"{print $1}\")'
+                sh returnStatus: true, script: 'docker rm $(JOB_NAME)'
+                sh returnStatus: true, script: 'docker rmi  $(docker images | grep ${registry} | awk \'{print $3}\') --force'
+            }
+
+	    }
+
+	    stage('Build Image') {
+	        steps {
+	            script {
+                    img = registry + ":$(env.BUILD_ID)"
+                    println ("$(img)")
+                    dockerImage = docker.build("$(img)")
+	            }
+	        }
+	    }
+
+	    stage("Testing - runningin jenkins Node") {
+	        steps {
+                sh "docker run -d --name $(JOB_NAME) -p 5000:5000 $(img)"
+	        }
+	    }
+
+	    stage("Push to DockerHub") {
+	        steps {
+	            script {
+	                docker.withRegistry( 'https://registry.hub.docker.com ', registryCredential ){
+	                     dockerImage.push()
+	                }
+	            }
+	        }
+	    }
+
+	    stage("running in staging"){
+	        steps{
+	            script {
+	             # goto pipeline syntax ssh agent
+	                def stopcontainer = "docker stop ${JOB_NAME}"
+	                def delconName = "docker rm $(JOB_NAME) "
+	                def delimages = 'docker image prune -a --force'
+	                def drun = "docker run -d --name $(JOB_NAME) -p 5000:5000 $(img)"
+	                sshagent(['docker-test']) {
+	                    sh returnStatus: true, script: "ssh -o StrictHostKeyChecking=no docker@192.168.1.16 ${stopcontainer}"
+	                    sh returnStatus: true, script: "ssh -o StrictHostKeyChecking=no docker@192.168.1.16 ${delcontName}"
+	                    sh returnStatus: true, script: "ssh -o StrictHostKeyChecking=no docker@192.168.1.16 ${delImages}"
+
+	                    sh "ssh -o StrictHostKeyChecking=no docker@192.168.1.16 ${drun}"
+	                   
+	                }
+	            }
+	        }
+	    }  
+	}
+}
+
+
+buildnow
+
+
+click on pipeline syntax -> 
+steps -> sample step -> shell script
+shell script 
+docker run -d --name $(JOB_NAME) -p 5000:5000 $(img)
+Generate pipeline script
+
+click on pipeline syntax -> 
+steps -> sample step -> ssh agent
+Generate pipeline script
+
+
+
+
+>> docker ps
+>> docker images
+>>  
