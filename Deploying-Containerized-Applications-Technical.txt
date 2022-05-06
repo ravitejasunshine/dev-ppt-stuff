@@ -103,7 +103,7 @@ openshift
 
 |--------------------|                  --------------
 | To-Do List JEE     |<---------------> | Database   |
-|			         |                  |            |
+|	             |                  |            |
 ----------------------                  --------------
  WideFly Container                      MYSQL Container
 
